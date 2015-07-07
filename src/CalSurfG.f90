@@ -2191,7 +2191,7 @@ fdm=0
 !
 !fang!   IF(wrgf.EQ.csid.OR.wrgf.LT.0)THEN
         if(writepath == 1) then
-      WRITE(40,*)nrp
+      WRITE(40,*)'#',nrp
       DO j=1,nrp
          rayx=(pi/2-rgx(j))*180.0/pi
          rayz=rgz(j)*180.0/pi
