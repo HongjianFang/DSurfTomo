@@ -1,5 +1,5 @@
 # SurfTomo15
-SurfTomo is the surface wave inversion program which can directly invert surface wave 
+DSurfTomo is the surface wave inversion program which can directly invert surface wave 
 dispersion data to 3D shear wave speed without the intermediate step of constructing 
 the phase or group velocity maps.A fast march method (FMM) is used to compute, at each 
 period, surface wave travel times and ray paths between sources and receivers. This 
