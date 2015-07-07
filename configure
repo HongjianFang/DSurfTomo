@@ -10,7 +10,7 @@ else:
 os.chdir('src')
 os.system('make clean')
 os.system('make')
-os.system('cp SurfTomo ../bin')
+os.system('cp DSurfTomo ../bin')
 print '--------------------------------------'
 print 'surf_tomo install over'
 print '--------------------------------------'
