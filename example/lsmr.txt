@@ -1,0 +1,8 @@
+
+
+ Enter LSMR.       Least-squares solution of  Ax = b
+ The matrix  A  has   4109 rows   and   2048 columns
+ damp   =  0.00000000000000E+00
+ atol   =  1.00E-03               conlim =  1.20E+03
+ btol   =  1.00E-03               itnlim =      1000
+ localSize (no. of vectors for local reorthogonalization) =    512
