@@ -2263,7 +2263,7 @@ ENDDO
 END SUBROUTINE bilinear
 
 
-        subroutine refineGrid2LayerMdl(minthk,mmax,dep,vp,vs,rho,&
+        subroutine refineGrid2LayerMdl(minthk0,mmax,dep,vp,vs,rho,&
                   rmax,rdep,rvp,rvs,rrho,rthk)
 !!--------------------------------------------------------------------c
 !!refine grid based model to layerd based model
@@ -2277,6 +2277,7 @@ END SUBROUTINE bilinear
         integer NL
         parameter (NL=200)
         integer mmax,rmax
+        real minthk0
         real minthk
         real dep(*),vp(*),vs(*),rho(*)
         real rdep(NL),rvp(NL),rvs(NL),rrho(NL),rthk(NL)
@@ -2288,6 +2289,7 @@ END SUBROUTINE bilinear
         initdep = 0.0
         do i = 1, mmax-1
            thk = dep(i+1)-dep(i)
+	   minthk = thk/minthk0
            nsublay(i) = int((thk+1.0e-4)/minthk) + 1
            ngrid = nsublay(i)+1
            newthk = thk/nsublay(i)
