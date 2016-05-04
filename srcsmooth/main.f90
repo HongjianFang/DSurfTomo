@@ -495,12 +495,12 @@
        write(*,'(a,f7.3)'),'weight is:',weight
        write(*,'(a,f8.1,a,f8.2,a,f8.3)'),'mean,std_devs and chi sqrue of &
            residual: ',mean*1000,'ms ',1000*std_devs,'ms ',&
-           dnrm2(dall,cbst,1)**2/dall
+           dnrm2(dall,cbst,1)**2/sqrt(dall)
        write(66,'(i2,a)'),iter,'th iteration...'
        write(66,'(a,f7.3)'),'weight is:',weight
        write(66,'(a,f8.1,a,f8.2,a,f8.3)'),'mean,std_devs and chi sqrue of &
            residual: ',mean*1000,'ms ',1000*std_devs,'ms ',&
-           dnrm2(dall,cbst,1)**2/dall
+           dnrm2(dall,cbst,1)**2/sqrt(dall)
 
         write(*,'(a,2f7.4)'),'min and max velocity variation ',&
             minval(dv),maxval(dv)

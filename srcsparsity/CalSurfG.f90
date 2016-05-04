@@ -67,6 +67,7 @@
     	  rhom(kk) = rhoz(kk)
     	enddo
     	!!half space
+    	depm(mmax)=depz(mmax)
     	vsm(mmax) = vsz(mmax)
     	vpm(mmax) = vpz(mmax)
     	rhom(mmax) = rhoz(mmax) 
