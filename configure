@@ -12,5 +12,5 @@ os.system('make clean')
 os.system('make')
 os.system('cp DSurfTomo ../bin')
 print '--------------------------------------'
-print 'surf_tomo install over'
+print 'Finishing DSurfTomo compiling'
 print '--------------------------------------'
