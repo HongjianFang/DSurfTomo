@@ -88,8 +88,8 @@
               vsm(i) = vsz(i)         
     
              do nn = 1,kmaxRc
-                cga = 0.5*(cg1(nn)+cg2(nn))
-                dlncg_dlnvs(nn,i) = (cg2(nn)-cg1(nn))/cga/dlnVs
+!                cga = 0.5*(cg1(nn)+cg2(nn))
+                dlncg_dlnvs(nn,i) = (cg2(nn)-cg1(nn))/(dlnVs*vsz(i))
              enddo
     
     
@@ -107,8 +107,8 @@
               vpm(i) = vpz(i)
     
              do nn = 1,kmaxRc
-                cga = 0.5*(cg1(nn)+cg2(nn))
-                dlncg_dlnvp(nn,i) = (cg2(nn)-cg1(nn))/cga/dlnVp
+!                cga = 0.5*(cg1(nn)+cg2(nn))
+                dlncg_dlnvp(nn,i) = (cg2(nn)-cg1(nn))/(dlnVp*vpz(i))
              enddo
               rhom(i) = rhoz(i) - 0.5*dlnrho*rhoz(i)
               call refineGrid2LayerMdl(minthk,mmax,depm,vpm,vsm,rhom,&
@@ -124,8 +124,8 @@
               rhom(i) = rhoz(i)
     
              do nn = 1,kmaxRc
-                cga = 0.5*(cg1(nn)+cg2(nn))
-                dlncg_dlnrho(nn,i) = (cg2(nn)-cg1(nn))/cga/dlnrho
+!                cga = 0.5*(cg1(nn)+cg2(nn))
+                dlncg_dlnrho(nn,i) = (cg2(nn)-cg1(nn))/(dlnrho*rhoz(i))
              enddo
      	  enddo
     	sen_vsRc((jj-1)*nx+ii,1:kmaxRc,1:mmax)=dlncg_dlnvs(1:kmaxRc,1:mmax)
