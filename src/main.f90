@@ -493,14 +493,14 @@
        std_devs = sqrt(sum(cbst(1:dall)**2)/dall - mean**2)
        write(*,'(i2,a)'),iter,'th iteration...'
        write(*,'(a,f7.3)'),'weight is:',weight
-       write(*,'(a,f8.1,a,f8.2,a,f8.3)'),'mean,std_devs and chi sqrue of &
+       write(*,'(a,f8.1,a,f8.2,a,f8.3)'),'mean,std_devs and rms of &
            residual: ',mean*1000,'ms ',1000*std_devs,'ms ',&
-           dnrm2(dall,cbst,1)**2/sqrt(real(dall))
+           dnrm2(dall,cbst,1)/sqrt(real(dall))
        write(66,'(i2,a)'),iter,'th iteration...'
        write(66,'(a,f7.3)'),'weight is:',weight
-       write(66,'(a,f8.1,a,f8.2,a,f8.3)'),'mean,std_devs and chi sqrue of &
+       write(66,'(a,f8.1,a,f8.2,a,f8.3)'),'mean,std_devs and rms of &
            residual: ',mean*1000,'ms ',1000*std_devs,'ms ',&
-           dnrm2(dall,cbst,1)**2/sqrt(real(dall))
+           dnrm2(dall,cbst,1)/sqrt(real(dall))
 
         write(*,'(a,2f7.4)'),'min and max velocity variation ',&
             minval(dv),maxval(dv)
