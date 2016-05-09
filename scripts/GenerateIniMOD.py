@@ -8,9 +8,9 @@ import numpy as np
 #start
 nx=18
 ny=18
-nz=9
-minvel=0.9
-velgrad=0.6
+nz=8
+minvel=0.8
+velgrad=0.5
 dep1=np.array([0,0.2,0.4,0.6,0.8,1.1,1.4,1.8,2.5])
 #end
 vs1=np.zeros(nz)

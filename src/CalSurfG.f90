@@ -285,9 +285,9 @@ sw=0
 IF(isx.lt.1.or.isx.gt.nnx)sw=1
 IF(isz.lt.1.or.isz.gt.nnz)sw=1
 IF(sw.eq.1)then
-   isx=90.0-isx*180.0/pi
-   isz=isz*180.0/pi
-   WRITE(6,*)"Source lies outside bounds of model (lat,long)= ",isx,isz
+   scx=90.0-scx*180.0/pi
+   scz=scz*180.0/pi
+   WRITE(6,*)"Source lies outside bounds of model (lat,long)= ",scx,scz
    WRITE(6,*)"TERMINATING PROGRAM!!!"
    STOP
 ENDIF
@@ -909,7 +909,7 @@ END MODULE traveltime
 subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
               goxdf,gozdf,dvxdf,dvzdf,kmaxRc,kmaxRg,kmaxLc,kmaxLg, &
               tRc,tRg,tLc,tLg,wavetype,igrt,periods,depz,minthk, &
-              scxf,sczf,rcxf,rczf,nrc1,nsrcsurf1,knum1,kmax,nsrcsurf,nrcf, &
+              scxf,sczf,rcxf,rczf,nrc1,nsrcsurf1,kmax,nsrcsurf,nrcf, &
               nar,writepath)
 USE globalp
 USE traveltime
@@ -965,7 +965,7 @@ REAL(KIND=i10) :: x,z,goxb,gozb,dnxb,dnzb
        real*8 tRc(*),tRg(*),tLc(*),tLg(*)
        integer wavetype(nsrcsurf,kmax)
        integer periods(nsrcsurf,kmax),nrc1(nsrcsurf,kmax),nsrcsurf1(kmax)
-       integer knum1(kmax),igrt(nsrcsurf,kmax)
+       integer igrt(nsrcsurf,kmax)
        real scxf(nsrcsurf,kmax),sczf(nsrcsurf,kmax),rcxf(nrcf,nsrcsurf,kmax),rczf(nrcf,nsrcsurf,kmax)
        integer nar
        real minthk
@@ -1102,35 +1102,35 @@ kmax1=kmaxRc
 kmax2=kmaxRc+kmaxRg
 kmax3=kmaxRc+kmaxRg+kmaxLc
 do knumi=1,kmax
-do srcnum=1,nsrcsurf1(knum1(knumi))
-	if(wavetype(srcnum,knum1(knumi))==2.and.igrt(srcnum,knum1(knumi))==0) then
-        velf(1:nx*ny)=pvRc(1:nx*ny,periods(srcnum,knum1(knumi)))
+do srcnum=1,nsrcsurf1(knumi)
+	if(wavetype(srcnum,knumi)==2.and.igrt(srcnum,knumi)==0) then
+        velf(1:nx*ny)=pvRc(1:nx*ny,periods(srcnum,knumi))
         sen_vs(:,1:kmax1,:)=sen_vsRc(:,1:kmaxRc,:)!(:,nt(istep),:)
         sen_vp(:,1:kmax1,:)=sen_vpRc(:,1:kmaxRc,:)!(:,nt(istep),:)
         sen_rho(:,1:kmax1,:)=sen_rhoRc(:,1:kmaxRc,:)!(:,nt(istep),:)
         endif
-	if(wavetype(srcnum,knum1(knumi))==2.and.igrt(srcnum,knum1(knumi))==1) then
-        velf(1:nx*ny)=pvRg(1:nx*ny,periods(srcnum,knum1(knumi)))
+	if(wavetype(srcnum,knumi)==2.and.igrt(srcnum,knumi)==1) then
+        velf(1:nx*ny)=pvRg(1:nx*ny,periods(srcnum,knumi))
         sen_vs(:,kmax1+1:kmax2,:)=sen_vsRg(:,1:kmaxRg,:)!(:,nt,:)
         sen_vp(:,kmax1+1:kmax2,:)=sen_vpRg(:,1:kmaxRg,:)!(:,nt,:)
         sen_rho(:,kmax1+1:kmax2,:)=sen_rhoRg(:,1:kmaxRg,:)!(:,nt,:)
         endif
-	if(wavetype(srcnum,knum1(knumi))==1.and.igrt(srcnum,knum1(knumi))==0) then
-        velf(1:nx*ny)=pvLc(1:nx*ny,periods(srcnum,knum1(knumi)))
+	if(wavetype(srcnum,knumi)==1.and.igrt(srcnum,knumi)==0) then
+        velf(1:nx*ny)=pvLc(1:nx*ny,periods(srcnum,knumi))
         sen_vs(:,kmax2+1:kmax3,:)=sen_vsLc(:,1:kmaxLc,:)!(:,nt,:)
         sen_vp(:,kmax2+1:kmax3,:)=sen_vpLc(:,1:kmaxLc,:)!(:,nt,:)
         sen_rho(:,kmax2+1:kmax3,:)=sen_rhoLc(:,1:kmaxLc,:)!(:,nt,:)
         endif
-	if(wavetype(srcnum,knum1(knumi))==1.and.igrt(srcnum,knum1(knumi))==1) then
-        velf(1:nx*ny)=pvLg(1:nx*ny,periods(srcnum,knum1(knumi)))
+	if(wavetype(srcnum,knumi)==1.and.igrt(srcnum,knumi)==1) then
+        velf(1:nx*ny)=pvLg(1:nx*ny,periods(srcnum,knumi))
         sen_vs(:,kmax3+1:kmax,:)=sen_vsLg(:,1:kmaxLg,:)!(:,nt,:)
         sen_vp(:,kmax3+1:kmax,:)=sen_vpLg(:,1:kmaxLg,:)!(:,nt,:)
         sen_rho(:,kmax3+1:kmax,:)=sen_rhoLg(:,1:kmaxLg,:)!(:,nt,:)
         endif
 
 call gridder(velf)
-   x=scxf(srcnum,knum1(knumi))
-   z=sczf(srcnum,knum1(knumi))
+   x=scxf(srcnum,knumi)
+   z=sczf(srcnum,knumi)
 !
 !  Begin by computing refined source grid if required
 !
@@ -1157,9 +1157,9 @@ call gridder(velf)
       IF(isx.lt.1.or.isx.gt.nnx)sw=1
       IF(isz.lt.1.or.isz.gt.nnz)sw=1
       IF(sw.eq.1)then
-         isx=90.0-isx*180.0/pi
-         isz=isz*180.0/pi
-         WRITE(6,*)"Source lies outside bounds of model (lat,long)= ",isx,isz
+         x=90.0-x*180.0/pi
+         z=z*180.0/pi
+         WRITE(6,*)"Source lies outside bounds of model (lat,long)= ",x,z
          WRITE(6,*)"TERMINATING PROGRAM!!!"
          STOP
       ENDIF
@@ -1308,8 +1308,8 @@ call gridder(velf)
 !  Find source-receiver traveltimes if required
 !
 !  
-         do istep=1,nrc1(srcnum,knum1(knumi))
-      CALL srtimes(x,z,rcxf(istep,srcnum,knum1(knumi)),rczf(istep,srcnum,knum1(knumi)),cbst1)
+         do istep=1,nrc1(srcnum,knumi)
+      CALL srtimes(x,z,rcxf(istep,srcnum,knumi),rczf(istep,srcnum,knumi),cbst1)
  count1=count1+1
 dsurf(count1)=cbst1
 !!-------------------------------------------------------------
@@ -1319,7 +1319,7 @@ dsurf(count1)=cbst1
 !  Calculate Frechet derivatives with the same subroutine
 !  if required.
 !
-      CALL rpaths(x,z,fdm,rcxf(istep,srcnum,knum1(knumi)),rczf(istep,srcnum,knum1(knumi)),writepath)
+      CALL rpaths(x,z,fdm,rcxf(istep,srcnum,knumi),rczf(istep,srcnum,knumi),writepath)
 row(1:nparpi)=0.0
 do jj=1,nvz
 do kk=1,nvx
@@ -1332,9 +1332,9 @@ coe_rho=coe_a*(1.6612-0.4721*2*vpft+&
 0.0671*3*vpft**2-0.0043*4*vpft**3+&
 0.000106*5*vpft**4)
 row((jj-1)*nvx+kk:(nz-2)*nvz*nvx+(jj-1)*nvx+kk:nvx*nvz)=&
-(sen_vp(jj*(nvx+2)+kk+1,knum1(knumi),1:nz-1)*coe_a+&
-sen_rho(jj*(nvx+2)+kk+1,knum1(knumi),1:nz-1)*coe_rho+&
-sen_vs(jj*(nvx+2)+kk+1,knum1(knumi),1:nz-1))*fdm(jj,kk)
+(sen_vp(jj*(nvx+2)+kk+1,knumi,1:nz-1)*coe_a+&
+sen_rho(jj*(nvx+2)+kk+1,knumi,1:nz-1)*coe_rho+&
+sen_vs(jj*(nvx+2)+kk+1,knumi,1:nz-1))*fdm(jj,kk)
 endif
 enddo
 enddo
@@ -1598,9 +1598,9 @@ REAL(KIND=i10), DIMENSION (2,2) :: vss
    IF(irx.lt.1.or.irx.gt.nnx)sw=1
    IF(irz.lt.1.or.irz.gt.nnz)sw=1
    IF(sw.eq.1)then
-      irx=90.0-irx*180.0/pi
-      irz=irz*180.0/pi
-      WRITE(6,*)"srtimes Receiver lies outside model (lat,long)= ",irx,irz
+      rcx1=90.0-rcx1*180.0/pi
+      rcz1=rcz1*180.0/pi
+      WRITE(6,*)"Receiver lies outside model (lat,long)= ",rcx1,rcz1
       WRITE(6,*)"TERMINATING PROGRAM!!!!"
       STOP
    ENDIF
@@ -1811,9 +1811,9 @@ fdm=0
    IF(ipx.lt.1.or.ipx.ge.nnx)sw=1
    IF(ipz.lt.1.or.ipz.ge.nnz)sw=1
    IF(sw.eq.1)then
-      ipx=90.0-ipx*180.0/pi
-      ipz=ipz*180.0/pi
-      WRITE(6,*)"rpath Receiver lies outside model (lat,long)= ",ipx,ipz
+      surfrcx=90.0-surfrcx*180.0/pi
+      surfrcz=surfrcz*180.0/pi
+      WRITE(6,*)"rpath Receiver lies outside model (lat,long)= ",surfrcx,surfrcz
       WRITE(6,*)"TERMINATING PROGRAM!!!"
       STOP
    ENDIF
@@ -2310,6 +2310,7 @@ END SUBROUTINE bilinear
         rvp(k) = vp(mmax)
         rvs(k) = vs(mmax)
         rrho(k) = rho(mmax)        
+	rdep(k) = dep(mmax)
 
         rmax = k
                 
@@ -2326,7 +2327,7 @@ END SUBROUTINE bilinear
 subroutine synthetic(nx,ny,nz,nparpi,vels,obst, &
               goxdf,gozdf,dvxdf,dvzdf,kmaxRc,kmaxRg,kmaxLc,kmaxLg, &
               tRc,tRg,tLc,tLg,wavetype,igrt,periods,depz,minthk, &
-              scxf,sczf,rcxf,rczf,nrc1,nsrcsurf1,knum1,kmax,nsrcsurf,nrcf,noiselevel) 
+              scxf,sczf,rcxf,rczf,nrc1,nsrcsurf1,kmax,nsrcsurf,nrcf,noiselevel) 
               
 USE globalp
 USE traveltime
@@ -2380,7 +2381,7 @@ REAL(KIND=i10) :: x,z,goxb,gozb,dnxb,dnzb
        real*8 tRc(*),tRg(*),tLc(*),tLg(*)
        integer wavetype(nsrcsurf,kmax)
        integer periods(nsrcsurf,kmax),nrc1(nsrcsurf,kmax),nsrcsurf1(kmax)
-       integer knum1(kmax),igrt(nsrcsurf,kmax)
+       integer igrt(nsrcsurf,kmax)
        real scxf(nsrcsurf,kmax),sczf(nsrcsurf,kmax),rcxf(nrcf,nsrcsurf,kmax),rczf(nrcf,nsrcsurf,kmax)
        real minthk
        integer nparpi
@@ -2502,35 +2503,35 @@ kmax1=kmaxRc
 kmax2=kmaxRc+kmaxRg
 kmax3=kmaxRc+kmaxRg+kmaxLc
 do knumi=1,kmax
-do srcnum=1,nsrcsurf1(knum1(knumi))
-	if(wavetype(srcnum,knum1(knumi))==2.and.igrt(srcnum,knum1(knumi))==0) then
-        velf(1:nx*ny)=pvRc(1:nx*ny,periods(srcnum,knum1(knumi)))
+do srcnum=1,nsrcsurf1(knumi)
+	if(wavetype(srcnum,knumi)==2.and.igrt(srcnum,knumi)==0) then
+        velf(1:nx*ny)=pvRc(1:nx*ny,periods(srcnum,knumi))
 !        sen_vs(:,1:kmax1,:)=sen_vsRc(:,1:kmaxRc,:)!(:,nt(istep),:)
 !        sen_vp(:,1:kmax1,:)=sen_vpRc(:,1:kmaxRc,:)!(:,nt(istep),:)
 !        sen_rho(:,1:kmax1,:)=sen_rhoRc(:,1:kmaxRc,:)!(:,nt(istep),:)
         endif
-	if(wavetype(srcnum,knum1(knumi))==2.and.igrt(srcnum,knum1(knumi))==1) then
-        velf(1:nx*ny)=pvRg(1:nx*ny,periods(srcnum,knum1(knumi)))
+	if(wavetype(srcnum,knumi)==2.and.igrt(srcnum,knumi)==1) then
+        velf(1:nx*ny)=pvRg(1:nx*ny,periods(srcnum,knumi))
 !        sen_vs(:,kmax1+1:kmax2,:)=sen_vsRg(:,1:kmaxRg,:)!(:,nt,:)
 !        sen_vp(:,kmax1+1:kmax2,:)=sen_vpRg(:,1:kmaxRg,:)!(:,nt,:)
 !        sen_rho(:,kmax1+1:kmax2,:)=sen_rhoRg(:,1:kmaxRg,:)!(:,nt,:)
         endif
-	if(wavetype(srcnum,knum1(knumi))==1.and.igrt(srcnum,knum1(knumi))==0) then
-        velf(1:nx*ny)=pvLc(1:nx*ny,periods(srcnum,knum1(knumi)))
+	if(wavetype(srcnum,knumi)==1.and.igrt(srcnum,knumi)==0) then
+        velf(1:nx*ny)=pvLc(1:nx*ny,periods(srcnum,knumi))
 !        sen_vs(:,kmax2+1:kmax3,:)=sen_vsLc(:,1:kmaxLc,:)!(:,nt,:)
 !        sen_vp(:,kmax2+1:kmax3,:)=sen_vpLc(:,1:kmaxLc,:)!(:,nt,:)
 !        sen_rho(:,kmax2+1:kmax3,:)=sen_rhoLc(:,1:kmaxLc,:)!(:,nt,:)
         endif
-	if(wavetype(srcnum,knum1(knumi))==1.and.igrt(srcnum,knum1(knumi))==1) then
-        velf(1:nx*ny)=pvLg(1:nx*ny,periods(srcnum,knum1(knumi)))
+	if(wavetype(srcnum,knumi)==1.and.igrt(srcnum,knumi)==1) then
+        velf(1:nx*ny)=pvLg(1:nx*ny,periods(srcnum,knumi))
 !        sen_vs(:,kmax3+1:kmax,:)=sen_vsLg(:,1:kmaxLg,:)!(:,nt,:)
 !        sen_vp(:,kmax3+1:kmax,:)=sen_vpLg(:,1:kmaxLg,:)!(:,nt,:)
 !        sen_rho(:,kmax3+1:kmax,:)=sen_rhoLg(:,1:kmaxLg,:)!(:,nt,:)
         endif
 
 call gridder(velf)
-   x=scxf(srcnum,knum1(knumi))
-   z=sczf(srcnum,knum1(knumi))
+   x=scxf(srcnum,knumi)
+   z=sczf(srcnum,knumi)
 !
 !  Begin by computing refined source grid if required
 !
@@ -2557,9 +2558,9 @@ call gridder(velf)
       IF(isx.lt.1.or.isx.gt.nnx)sw=1
       IF(isz.lt.1.or.isz.gt.nnz)sw=1
       IF(sw.eq.1)then
-         isx=90.0-isx*180.0/pi
-         isz=isz*180.0/pi
-         WRITE(6,*)"Source lies outside bounds of model (lat,long)= ",isx,isz
+         x=90.0-x*180.0/pi
+         z=z*180.0/pi
+         WRITE(6,*)"Source lies outside bounds of model (lat,long)= ",x,z
          WRITE(6,*)"TERMINATING PROGRAM!!!"
          STOP
       ENDIF
@@ -2708,46 +2709,11 @@ call gridder(velf)
 !  Find source-receiver traveltimes if required
 !
 !  
-         do istep=1,nrc1(srcnum,knum1(knumi))
-      CALL srtimes(x,z,rcxf(istep,srcnum,knum1(knumi)),rczf(istep,srcnum,knum1(knumi)),cbst1)
+         do istep=1,nrc1(srcnum,knumi)
+      CALL srtimes(x,z,rcxf(istep,srcnum,knumi),rczf(istep,srcnum,knumi),cbst1)
  count1=count1+1
 obst(count1)=cbst1 + cbst1*gaussian()*noiselevel
-!!-------------------------------------------------------------
-!   ENDIF
-!
-!  Calculate raypath geometries and write to file if required.
-!  Calculate Frechet derivatives with the same subroutine
-!  if required.
-!
-!      CALL rpaths(x,z,fdm,rcxf(istep,srcnum,knum1(knumi)),rczf(istep,srcnum,knum1(knumi)))
-!row(1:nparpi)=0.0
-!do jj=1,nvz
-!do kk=1,nvx
-!if(abs(fdm(jj,kk)).ge.ftol) then
-!coe_a=(2.0947-0.8206*2*vels(kk+1,jj+1,1:nz)+&
-!0.2683*3*vels(kk+1,jj+1,1:nz)**2-0.0251*4*vels(kk+1,jj+1,1:nz)**3)
-!vpft=0.9409 + 2.0947*vels(kk+1,jj+1,1:nz) - 0.8206*vels(kk+1,jj+1,1:nz)**2+ &
-!0.2683*vels(kk+1,jj+1,1:nz)**3 - 0.0251*vels(kk+1,jj+1,1:nz)**4
-!coe_rho=coe_a*(1.6612-0.4721*2*vpft+&
-!0.0671*3*vpft**2-0.0043*4*vpft**3+&
-!0.000106*5*vpft**4)
-!row((jj-1)*nvx+kk:(nz-1)*nvz*nvx+(jj-1)*nvx+kk:nvx*nvz)=&
-!(sen_vp(jj*(nvx+2)+kk+1,knum1(knumi),1:nz)*coe_a+&
-!sen_rho(jj*(nvx+2)+kk+1,knum1(knumi),1:nz)*coe_rho+&
-!sen_vs(jj*(nvx+2)+kk+1,knum1(knumi),1:nz))*fdm(jj,kk)
-!endif
-!enddo
-!enddo
-!              call wavelettrans(nvx,nvz,nz,row,maxlevel,maxleveld,HorizonType,VerticalType)
-!		do nn=1,nparpi
-!		if(abs(row(nn)).gt.1e-2) then
-!		nar=nar+1
-!		rw(nar)=real(row(nn))
-!		iw(nar+1)= count1
-!                col(nar)=nn
-!		endif
-!		enddo
-	    enddo
+    enddo
 
 
 

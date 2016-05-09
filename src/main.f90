@@ -47,7 +47,6 @@
             integer localSize
             real mean,std_devs,balances,balanceb
             integer msurf
-            real,parameter:: tolr=1e-4
             real,dimension(:),allocatable:: obst,dsyn,cbst,wt,dtres,dist,datweight
          	real,dimension(:),allocatable:: pvall,depRp,pvRp
         	real sta1_lat,sta1_lon,sta2_lat,sta2_lon
@@ -60,7 +59,7 @@
                 real, dimension (:,:), allocatable :: scxf,sczf
                 real, dimension (:,:,:), allocatable :: rcxf,rczf
 	        integer,dimension(:,:),allocatable::wavetype,igrt,nrc1
-         	integer,dimension(:),allocatable::nsrc1,knum1
+         	integer,dimension(:),allocatable::nsrc1
          	integer,dimension(:,:),allocatable::periods
          	real,dimension(:),allocatable::rw
          	integer,dimension(:),allocatable::iw,col
@@ -218,7 +217,7 @@
             write(6,*)'error with allocate'
             endif
             allocate(periods(nsrc,kmax),wavetype(nsrc,kmax),&
-            nrc1(nsrc,kmax),nsrc1(kmax),knum1(kmax),&
+            nrc1(nsrc,kmax),nsrc1(kmax),&
             igrt(nsrc,kmax),stat=checkstat)
             if(checkstat > 0)then
             write(6,*)'error with allocate'
@@ -260,7 +259,6 @@
             wavetype(istep,knum)=wavetp
             igrt(istep,knum)=veltp
             nsrc1(knum)=istep
-            knum1(istep2)=knum
             knumo=knum
             else
             read(line,*) sta2_lat,sta2_lon,velvalue
@@ -282,7 +280,7 @@
             enddo
             close(87)
             allocate(depz(nz), stat=checkstat)
-            maxnar = dall*nx*ny*nz*spfra!sparsity fraction
+            maxnar = spfra*dall*nx*ny*nz!sparsity fraction
             maxvp = (nx-2)*(ny-2)*(nz-1)
             allocate(dv(maxvp), stat=checkstat)
             allocate(norm(maxvp), stat=checkstat)
@@ -336,7 +334,7 @@
             call synthetic(nx,ny,nz,maxvp,vsftrue,obst,&
                 goxd,gozd,dvxd,dvzd,kmaxRc,kmaxRg,kmaxLc,kmaxLg,&
                 tRc,tRg,tLc,tLg,wavetype,igrt,periods,depz,minthk,&
-                scxf,sczf,rcxf,rczf,nrc1,nsrc1,knum1,kmax,&
+                scxf,sczf,rcxf,rczf,nrc1,nsrc1,kmax,&
                 nsrc,nrc,noiselevel)
             endif
 
@@ -358,7 +356,7 @@
             call CalSurfG(nx,ny,nz,maxvp,vsf,iw,rw,col,dsyn,&
                 goxd,gozd,dvxd,dvzd,kmaxRc,kmaxRg,kmaxLc,kmaxLg,&
                 tRc,tRg,tLc,tLg,wavetype,igrt,periods,depz,minthk,&
-                scxf,sczf,rcxf,rczf,nrc1,nsrc1,knum1,kmax,&
+                scxf,sczf,rcxf,rczf,nrc1,nsrc1,kmax,&
                 nsrc,nrc,nar,writepath)
 
 	        do i = 1,dall
@@ -592,7 +590,7 @@
         deallocate(scxf,sczf)
         deallocate(rcxf,rczf)
         deallocate(wavetype,igrt,nrc1)
-        deallocate(nsrc1,knum1,periods)
+        deallocate(nsrc1,periods)
         deallocate(rw)
         deallocate(iw,col)
         deallocate(cbst,wt,dtres,datweight)
