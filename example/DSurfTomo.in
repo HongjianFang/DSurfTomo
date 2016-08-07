@@ -5,7 +5,7 @@ surfdataTB.dat			 c: data file
 18 18 9                          c: nx ny nz (grid number in lat lon and depth direction)
 25.2  121.35                     c: goxd gozd (upper left point,[lat,lon])
 0.015 0.017                      c: dvxd dvzd (grid interval in lat and lon direction)
-449                              c: nsrc*maxf 
+25i                              c: nsrc*maxf 
 4.0  0.0                         c: weight damp
 3                                c: nsublayer (numbers of sublayers for each grid interval:grid --> layer)
 0.5 2.8                          c: minimum velocity, maximum velocity
@@ -19,3 +19,5 @@ surfdataTB.dat			 c: data file
 0                                c: synthetic flag(0:real data,1:synthetic)
 0.02                             c: noiselevel 
 2.5				 c: threshold
+1				 c: modest (1: estimate model variation, 0: no estimation)
+30				 c: number of random models
