@@ -2470,6 +2470,16 @@ subroutine refineGrid2LayerMdl(minthk0,mmax,dep,vp,vs,rho,&
       igr=0
       call caldespersion(nx,ny,nz,vels,pvRc, &
         iwave,igr,kmaxRc,tRc,depz,minthk)
+
+        open(62,file='velmap2dRc.dat')
+        do k = 1,kmaxRc
+        do j=1,ny-2
+        do i=1,nx-2
+        write(62,'(5f8.4)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,tRc(k),pvRc((j+1)*nx+i+1,k)
+        enddo
+        enddo
+        enddo
+        close(62)
     endif
 
     if(kmaxRg.gt.0) then
@@ -2477,6 +2487,15 @@ subroutine refineGrid2LayerMdl(minthk0,mmax,dep,vp,vs,rho,&
       igr=1
       call caldespersion(nx,ny,nz,vels,pvRg, &
         iwave,igr,kmaxRg,tRg,depz,minthk)
+        open(62,file='velmap2dRg.dat')
+        do k = 1,kmaxRg
+        do j=1,ny-2
+        do i=1,nx-2
+        write(62,'(5f8.4)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,tRg(k),pvRg((j+1)*nx+i+1,k)
+        enddo
+        enddo
+        enddo
+        close(62)
     endif
 
     if(kmaxLc.gt.0) then
@@ -2484,6 +2503,16 @@ subroutine refineGrid2LayerMdl(minthk0,mmax,dep,vp,vs,rho,&
       igr=0
       call caldespersion(nx,ny,nz,vels,pvLc, &
         iwave,igr,kmaxLc,tLc,depz,minthk)
+
+        open(62,file='velmap2dLc.dat')
+        do k = 1,kmaxLc
+        do j=1,ny-2
+        do i=1,nx-2
+        write(62,'(5f8.4)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,tLc(k),pvLc((j+1)*nx+i+1,k)
+        enddo
+        enddo
+        enddo
+        close(62)
     endif
 
     if(kmaxLg.gt.0) then
@@ -2491,7 +2520,18 @@ subroutine refineGrid2LayerMdl(minthk0,mmax,dep,vp,vs,rho,&
       igr=1
       call caldespersion(nx,ny,nz,vels,pvLg, &
         iwave,igr,kmaxLg,tLg,depz,minthk)
+
+        open(62,file='velmap2dLg.dat')
+        do k = 1,kmaxLg
+        do j=1,ny-2
+        do i=1,nx-2
+        write(62,'(5f8.4)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,tLg(k),pvLg((j+1)*nx+i+1,k)
+        enddo
+        enddo
+        enddo
+        close(62)
     endif
+
 
     !nar=0
     count1=0
