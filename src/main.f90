@@ -498,7 +498,7 @@ program SurfTomo
     acond = 0.0
     arnorm = 0.0
     xnorm = 0.0
-    localSize = n/4
+    localSize = 10
 
     call LSMR(m, n, leniw, lenrw,iw,rw,cbst, damp,&
       atol, btol, conlim, itnlim, localSize, nout,&

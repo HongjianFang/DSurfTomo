@@ -973,7 +973,7 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
 
 
   real vpz(nz),vsz(nz),rhoz(nz),depz(nz)
-  real*8 pvRc(nx*ny,kmaxRc),pvRg(nx*ny,kmaxRg),pvLc(nx*ny,kmaxLc),pvLg(nx*ny,kmaxLg)
+  real*8 pvRc(nx*ny,kmax),pvRg(nx*ny,kmaxRg),pvLc(nx*ny,kmax),pvLg(nx*ny,kmaxLg)
   real*8 sen_vsRc(nx*ny,kmaxRc,nz),sen_vpRc(nx*ny,kmaxRc,nz)
   real*8 sen_rhoRc(nx*ny,kmaxRc,nz)
   real*8 sen_vsRg(nx*ny,kmaxRg,nz),sen_vpRg(nx*ny,kmaxRg,nz)
@@ -1076,8 +1076,9 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
   if(kmaxRg.gt.0) then
     iwave=2
     igr=0
+!    print*,kmax
     call caldespersion(nx,ny,nz,vels,pvRc, &
-        iwave,igr,kmaxRc,tRc,depz,minthk)
+        iwave,igr,kmax,tRg,depz,minthk)
     igr=1
     call depthkernel(nx,ny,nz,vels,pvRg,sen_vsRg,sen_vpRg, &
       sen_rhoRg,iwave,igr,kmaxRg,tRg,depz,minthk)
@@ -1087,14 +1088,14 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
     iwave=1
     igr=0
     call depthkernel(nx,ny,nz,vels,pvLc,sen_vsLc,sen_vpLc, &
-      sen_rhoLc,iwave,igr,kmaxLc,tLc,depz,minthk)
+      sen_rhoLc,iwave,igr,kmax,tLc,depz,minthk)
   endif
 
   if(kmaxLg.gt.0) then
     iwave=1
     igr=0
     call caldespersion(nx,ny,nz,vels,pvLc, &
-        iwave,igr,kmaxRc,tRc,depz,minthk)
+        iwave,igr,kmax,tLg,depz,minthk)
     igr=1
     call depthkernel(nx,ny,nz,vels,pvLg,sen_vsLg,sen_vpLg, &
       sen_rhoLg,iwave,igr,kmaxLg,tLg,depz,minthk)
@@ -1372,11 +1373,17 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
         enddo
       endif ! 'if' before rpath
       enddo
+      IF(asgr.EQ.1)THEN
+        DEALLOCATE (velnb, STAT=checkstat)
+        IF(checkstat > 0)THEN
+          WRITE(6,*)'Error with DEALLOCATE: PROGRAM fmmin2d: velnb'
+        ENDIF
+      ENDIF
+      IF(asgr.EQ.1)DEALLOCATE(ttnr,nstsr)
       enddo ! 'do' before gridder 
 
 
 
-      IF(asgr.EQ.1)DEALLOCATE(ttnr,nstsr)
 
       IF(rbint.EQ.1)THEN
         WRITE(6,*)'Note that at least one two-point ray path'
@@ -1385,12 +1392,6 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
         WRITE(6,*)'a true path, and it is STRONGLY RECOMMENDED'
         WRITE(6,*)'that you adjust the dimensions of your grid'
         WRITE(6,*)'to prevent this from occurring.'
-      ENDIF
-      IF(asgr.EQ.1)THEN
-        DEALLOCATE (velnb, STAT=checkstat)
-        IF(checkstat > 0)THEN
-          WRITE(6,*)'Error with DEALLOCATE: PROGRAM fmmin2d: velnb'
-        ENDIF
       ENDIF
     enddo
   enddo
