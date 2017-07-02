@@ -218,8 +218,8 @@ program SurfTomo
   read(10,*)ifsyn
   read(10,*)noiselevel
   read(10,*) threshold0
-  read(10,*) modest
-  read(10,*) numrand
+!  read(10,*) modest
+!  read(10,*) numrand
   close(10)
   nrc=nsrc
   kmax=kmaxRc+kmaxRg+kmaxLc+kmaxLg
@@ -607,69 +607,69 @@ program SurfTomo
   close(nout) !close lsmr.txt
   close(66) !close surf_tomo.log
 
-! USE RANDOM MODEL TO OBTAIN THE MODEL VARIATION
-  !modest = 1
-  if (modest ==1) then
-
-    write(*,*) 'model variation estimation begin...'
-    do iter = 1,numrand
-      call init_random_seed()
-      vsftrue=vsf
-      DO K=1,NZ-1
-        DO J=2,NY-1
-          DO I=2,NX-1
-            idx = (k-1)*(ny-2)*(nx-2)+(j-2)*(nx-2)+i-1
-            dv(idx) = 0.1/EXP(2*NORM(idx)/maxnorm)*gaussian()
-            VSFTRUE(I,J,K) = VSF(I,J,K)+dv(idx)
-          ENDDO
-        ENDDO
-      ENDDO
-      write(*,*),'maximum and minimum velocity variation',maxval(dv),minval(dv)
-
-      call synthetic(nx,ny,nz,maxvp,vsftrue,dsyn,&
-        goxd,gozd,dvxd,dvzd,kmaxRc,kmaxRg,kmaxLc,kmaxLg,&
-        tRc,tRg,tLc,tLg,wavetype,igrt,periods,depz,minthk,&
-        scxf,sczf,rcxf,rczf,nrc1,nsrc1,kmax,&
-        nsrc,nrc,0.0)
-
-      do i = 1,dall
-        cbst(i) = obst(i) - dsyn(i)
-      enddo
-
-      write(*,*), dnrm2(dall,cbst,1)/sqrt(real(dall)), 1.05*std_devs
-      if (dnrm2(dall,cbst,1)/sqrt(real(dall)) < 1.05*std_devs) then
-        counte = counte + 1
-        modstat(counte,:) = dv
-      endif
-
-    enddo ! iteration for random models
-
-    write(*,*),'number of of models satisfy requirements',counte
-    modsig = 1.0
-    if (counte>0) then
-      do i=1,maxvp
-        !statis
-        !mean = sum(cbst(1:dall))/dall
-        !std_devs = sqrt(sum(cbst(1:dall)**2)/dall - mean**2)
-        mean = sum(modstat(1:counte,i))/counte
-        stdvs = sqrt(sum(modstat(1:counte,i)**2)/counte-mean**2) 
-        modsig(i) = stdvs
-      enddo
-    endif
-
-    write(*,*),'write model variation to "model_variation.dat"'
-    open (64,file='model_variation.dat')
-    do k=1,nz-1
-      do j=1,ny-2
-        do i=1,nx-2
-          idx = (k-1)*(ny-2)*(nx-2)+(j-1)*(nx-2)+i
-          write(64,'(5f8.4)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),modsig(idx)
-        enddo
-      enddo
-    enddo
-    close(64)
-    write(*,*) 'finishing model variation estimation'
-  endif
+!! USE RANDOM MODEL TO OBTAIN THE MODEL VARIATION
+!  !modest = 1
+!  if (modest ==1) then
+!
+!    write(*,*) 'model variation estimation begin...'
+!    do iter = 1,numrand
+!      call init_random_seed()
+!      vsftrue=vsf
+!      DO K=1,NZ-1
+!        DO J=2,NY-1
+!          DO I=2,NX-1
+!            idx = (k-1)*(ny-2)*(nx-2)+(j-2)*(nx-2)+i-1
+!            dv(idx) = 0.1/EXP(2*NORM(idx)/maxnorm)*gaussian()
+!            VSFTRUE(I,J,K) = VSF(I,J,K)+dv(idx)
+!          ENDDO
+!        ENDDO
+!      ENDDO
+!      write(*,*),'maximum and minimum velocity variation',maxval(dv),minval(dv)
+!
+!      call synthetic(nx,ny,nz,maxvp,vsftrue,dsyn,&
+!        goxd,gozd,dvxd,dvzd,kmaxRc,kmaxRg,kmaxLc,kmaxLg,&
+!        tRc,tRg,tLc,tLg,wavetype,igrt,periods,depz,minthk,&
+!        scxf,sczf,rcxf,rczf,nrc1,nsrc1,kmax,&
+!        nsrc,nrc,0.0)
+!
+!      do i = 1,dall
+!        cbst(i) = obst(i) - dsyn(i)
+!      enddo
+!
+!      write(*,*), dnrm2(dall,cbst,1)/sqrt(real(dall)), 1.05*std_devs
+!      if (dnrm2(dall,cbst,1)/sqrt(real(dall)) < 1.05*std_devs) then
+!        counte = counte + 1
+!        modstat(counte,:) = dv
+!      endif
+!
+!    enddo ! iteration for random models
+!
+!    write(*,*),'number of of models satisfy requirements',counte
+!    modsig = 1.0
+!    if (counte>0) then
+!      do i=1,maxvp
+!        !statis
+!        !mean = sum(cbst(1:dall))/dall
+!        !std_devs = sqrt(sum(cbst(1:dall)**2)/dall - mean**2)
+!        mean = sum(modstat(1:counte,i))/counte
+!        stdvs = sqrt(sum(modstat(1:counte,i)**2)/counte-mean**2) 
+!        modsig(i) = stdvs
+!      enddo
+!    endif
+!
+!    write(*,*),'write model variation to "model_variation.dat"'
+!    open (64,file='model_variation.dat')
+!    do k=1,nz-1
+!      do j=1,ny-2
+!        do i=1,nx-2
+!          idx = (k-1)*(ny-2)*(nx-2)+(j-1)*(nx-2)+i
+!          write(64,'(5f8.4)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),modsig(idx)
+!        enddo
+!      enddo
+!    enddo
+!    close(64)
+!    write(*,*) 'finishing model variation estimation'
+!  endif
 
 
 

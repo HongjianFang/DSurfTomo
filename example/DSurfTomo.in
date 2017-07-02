@@ -19,5 +19,3 @@ surfdataTB.dat			 c: data file
 0                                c: synthetic flag(0:real data,1:synthetic)
 0.02                             c: noiselevel 
 2.5				 c: threshold
-1				 c: modest (1: estimate model variation, 0: no estimation)
-30				 c: number of random models

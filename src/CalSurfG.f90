@@ -1145,7 +1145,8 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
       do ig = 1,igroup
       if (ig ==2 .and. wavetype(srcnum,knumi) == 2) then
         velf(1:nx*ny) = pvRc(1:nx*ny,periods(srcnum,knumi))
-      else
+      endif
+      if (ig ==2 .and. wavetype(srcnum,knumi) == 1) then
         velf(1:nx*ny) = pvLc(1:nx*ny,periods(srcnum,knumi))
       endif
       call gridder(velf)
