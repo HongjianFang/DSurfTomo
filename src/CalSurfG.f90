@@ -998,6 +998,8 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
   integer level,maxlevel,maxleveld,HorizonType,VerticalType,PorS
   real,parameter::ftol=1e-4
   integer writepath
+  integer ig, igroup
+
   gdx=5
   gdz=5
   asgr=1
@@ -1073,6 +1075,9 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
 
   if(kmaxRg.gt.0) then
     iwave=2
+    igr=0
+    call caldespersion(nx,ny,nz,vels,pvRc, &
+        iwave,igr,kmaxRc,tRc,depz,minthk)
     igr=1
     call depthkernel(nx,ny,nz,vels,pvRg,sen_vsRg,sen_vpRg, &
       sen_rhoRg,iwave,igr,kmaxRg,tRg,depz,minthk)
@@ -1087,6 +1092,9 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
 
   if(kmaxLg.gt.0) then
     iwave=1
+    igr=0
+    call caldespersion(nx,ny,nz,vels,pvLc, &
+        iwave,igr,kmaxRc,tRc,depz,minthk)
     igr=1
     call depthkernel(nx,ny,nz,vels,pvLg,sen_vsLg,sen_vpLg, &
       sen_rhoLg,iwave,igr,kmaxLg,tLg,depz,minthk)
@@ -1128,6 +1136,18 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
         sen_rho(:,kmax3+1:kmax,:)=sen_rhoLg(:,1:kmaxLg,:)!(:,nt,:)
       endif
 
+      ! only for Rayleigh wave group velocity, revise this latter for Love wave group velocity
+      if (igrt(srcnum,knumi)==1) then
+        igroup = 2
+      else
+        igroup = 1
+      endif
+      do ig = 1,igroup
+      if (ig ==2 .and. wavetype(srcnum,knumi) == 2) then
+        velf(1:nx*ny) = pvRc(1:nx*ny,periods(srcnum,knumi))
+      else
+        velf(1:nx*ny) = pvLc(1:nx*ny,periods(srcnum,knumi))
+      endif
       call gridder(velf)
       x=scxf(srcnum,knumi)
       z=sczf(srcnum,knumi)
@@ -1309,9 +1329,11 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
       !
       !  
       do istep=1,nrc1(srcnum,knumi)
+        if (ig == 1) then
         CALL srtimes(x,z,rcxf(istep,srcnum,knumi),rczf(istep,srcnum,knumi),cbst1)
         count1=count1+1
         dsurf(count1)=cbst1
+        endif
         !!-------------------------------------------------------------
         !   ENDIF
         !
@@ -1319,6 +1341,7 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
         !  Calculate Frechet derivatives with the same subroutine
         !  if required.
         !
+        if (igrt(srcnum,knumi) == 0 .or. (ig == 2 .and. igrt(srcnum,knumi) == 1)) then
         CALL rpaths(x,z,fdm,rcxf(istep,srcnum,knumi),rczf(istep,srcnum,knumi),writepath)
         row(1:nparpi)=0.0
         do jj=1,nvz
@@ -1346,7 +1369,9 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
             col(nar)=nn
           endif
         enddo
+      endif ! 'if' before rpath
       enddo
+      enddo ! 'do' before gridder 
 
 
 
