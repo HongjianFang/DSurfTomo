@@ -106,9 +106,9 @@ program SurfTomo
   integer idx
   integer counte
   real stdvs
-  integer numrand
-  real,allocatable,dimension(:,:)::modstat
-  real,allocatable,dimension(:)::modsig
+!  integer numrand
+!  real,allocatable,dimension(:,:)::modstat
+!  real,allocatable,dimension(:)::modsig
   real gaussian
   external gaussian
   integer modest
@@ -303,8 +303,8 @@ program SurfTomo
   allocate(vsftrue(nx,ny,nz), stat=checkstat)
   ! FOR MODEL VARIATION
   !------------------------------------------------
-  allocate(modstat(numrand,maxvp))
-  allocate(modsig(maxvp))
+!  allocate(modstat(numrand,maxvp))
+!  allocate(modsig(maxvp))
 
   allocate(rw(maxnar), stat=checkstat)
   if(checkstat > 0)then
@@ -555,6 +555,18 @@ program SurfTomo
         write(34,'(100f8.1)') (norm((k-1)*(ny-2)*(nx-2)+(j-2)*(nx-2)+i-1),i=2,nx-1)
       enddo
     enddo
+
+    write(outmodel,'(a,a,i3.3)') trim(inputfile),'Measure.dat.iter',iter
+    open(64,file=outmodel)
+    do k=1,nz-1
+      do j=1,ny-2
+        do i=1,nx-2
+          write(64,'(5f8.4)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsf(i+1,j+1,k)
+        enddo
+      enddo
+    enddo
+    close(64)
+
 
   enddo !end iteration
 
