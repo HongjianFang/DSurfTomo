@@ -1349,8 +1349,8 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
         ! a little stupid, remember to change latter
         if (igrt(srcnum,knumi) == 1) then
         call gridder(velf0)
-        count11=count11+1
         endif
+        count11=count11+1
         CALL rpaths(x,z,fdm,rcxf(istep,srcnum,knumi),rczf(istep,srcnum,knumi),writepath)
         row(1:nparpi)=0.0
         do jj=1,nvz

@@ -561,7 +561,7 @@ program SurfTomo
     do k=1,nz-1
       do j=1,ny-2
         do i=1,nx-2
-          write(64,'(5f8.4)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsf(i+1,j+1,k)
+          write(64,'(5f9.3)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsf(i+1,j+1,k)
         enddo
       enddo
     enddo
@@ -582,8 +582,8 @@ program SurfTomo
     do k=1,nz-1
       do j=1,ny-2
         do i=1,nx-2
-          write(65,'(5f8.4)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsftrue(i+1,j+1,k)
-          write(63,'(5f8.4)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsf(i+1,j+1,k)
+          write(65,'(5f9.3)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsftrue(i+1,j+1,k)
+          write(63,'(5f9.3)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsf(i+1,j+1,k)
         enddo
       enddo
     enddo
@@ -603,7 +603,7 @@ program SurfTomo
     do k=1,nz-1
       do j=1,ny-2
         do i=1,nx-2
-          write(64,'(5f8.4)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsf(i+1,j+1,k)
+          write(64,'(5f9.3)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsf(i+1,j+1,k)
         enddo
       enddo
     enddo
