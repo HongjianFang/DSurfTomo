@@ -985,8 +985,8 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
   real*8 sen_vs(nx*ny,kmax,nz),sen_vp(nx*ny,kmax,nz)
   real*8 sen_rho(nx*ny,kmax,nz)
   real coe_rho(nz-1),coe_a(nz-1)
-  real*8 velf(ny*nx)
-  integer kmax1,kmax2,kmax3,count1
+  real*8 velf(ny*nx),velf0(ny*nx)
+  integer kmax1,kmax2,kmax3,count1,count11
   integer igr
   integer iwave
   integer knumi,srcnum
@@ -1143,6 +1143,8 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
       else
         igroup = 1
       endif
+      velf0 = velf
+      count11 = count1
       do ig = 1,igroup
       if (ig ==2 .and. wavetype(srcnum,knumi) == 2) then
         velf(1:nx*ny) = pvRc(1:nx*ny,periods(srcnum,knumi))
@@ -1344,6 +1346,11 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
         !  if required.
         !
         if (igrt(srcnum,knumi) == 0 .or. (ig == 2 .and. igrt(srcnum,knumi) == 1)) then
+        ! a little stupid, remember to change latter
+        if (igrt(srcnum,knumi) == 1) then
+        call gridder(velf0)
+        count11=count11+1
+        endif
         CALL rpaths(x,z,fdm,rcxf(istep,srcnum,knumi),rczf(istep,srcnum,knumi),writepath)
         row(1:nparpi)=0.0
         do jj=1,nvz
@@ -1367,7 +1374,7 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
           if(abs(row(nn)).gt.ftol) then
             nar=nar+1
             rw(nar)=real(row(nn))
-            iw(nar+1)= count1
+            iw(nar+1)= count11
             col(nar)=nn
           endif
         enddo
