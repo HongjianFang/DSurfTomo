@@ -12,7 +12,7 @@ nz=9
 minvel=0.9
 velgrad=0.6
 dep1=[0,0.2,0.4,0.6,0.8,1.1,1.4,1.8,2.5]
-anosize=1.0
+anosize=0.5
 amplitude=0.4
 #end
 x=range(1,nx+1)
@@ -35,7 +35,7 @@ for k in range(nz):
     for i in range(nx):
 	mod[(k)*ny+j,i]=bg[k,i,j]+pxy[k,i,j]*amplitude
 k=5
-plt.imshow(mod[k*ny:(k+1)*ny,:],cmap='jet_r',interpolation='bicubic')
+plt.imshow(mod[k*ny:(k+1)*ny,:],cmap='jet_r')
 np.savetxt('MOD.true',mod,fmt='%4.4f')
 plt.colorbar()
 plt.show()

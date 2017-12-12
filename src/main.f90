@@ -382,12 +382,36 @@ program SurfTomo
       cbst(i) = obst(i) - dsyn(i)
     enddo
 
-    threshold = threshold0+(maxiter/2-iter)/3*0.5
+    ! write out rw, iw and cbst for testing
+    !open(44,file='iw.dat')
+    !write(44,*) nar
+    !do i = 2,nar+1
+    !write(44,*) iw(i)
+    !enddo
+    !do i = 1,nar
+    !write(44,*) col(i)
+    !enddo
+    !close(44)
+
+    !open(44,file='rw.dat')
+    !do i = 1,nar
+    !write(44,*) rw(i)
+    !enddo
+    !close(44)
+
+    !open(44,file='residal.dat')
+    !do i = 1,dall
+    !write(44,*) cbst(i)
+    !enddo
+    !close(44)
+
+    !threshold = threshold0+(maxiter/2-iter)/3*0.5
     do i = 1,dall
-      datweight(i) = 1.0
-      if(abs(cbst(i)) > threshold) then
-        datweight(i) = exp(-(abs(cbst(i))-threshold))
-      endif
+!      datweight(i) = 1.0
+!      if(abs(cbst(i)) > threshold) then
+!        datweight(i) = exp(-(abs(cbst(i))-threshold))
+!      endif
+      datweight(i) = 1.0/(1+0.05*exp(cbst(i)**2*threshold0))
       cbst(i) = cbst(i)*datweight(i)
     enddo
 

@@ -6,20 +6,19 @@ import numpy as np
 
 #parameters need to be changed
 #start
-nx=75
-ny=96
-nz=17
+nx=18
+ny=18
+nz=8
 minvel=0.8
 velgrad=0.5
-dep1=1.5+np.array([-1.5, 0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0,10.0,11.0,13.0,16.0,20.0,30.0])
-vel1=np.loadtxt('mod.1d')
+dep1=np.array([0,0.2,0.4,0.6,0.8,1.1,1.4,1.8,2.5])
 #end
 vs1=np.zeros(nz)
 mod=np.zeros((nz*ny,nx))
 for k in range(nz):
   for j in range(ny):
     for i in range(nx):
-      mod[k*ny+j,i]= vel1[k]/1.75#minvel+dep1[k]*velgrad
+      mod[k*ny+j,i]= minvel+dep1[k]*velgrad
 with open('MOD','w') as fp:
     for i in range(nz):
         fp.write('%5.1f' % dep1[i])
