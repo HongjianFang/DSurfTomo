@@ -453,7 +453,8 @@ program SurfTomo
 
 
     ! ADDING REGULARIZATION TERM
-    weight=dnrm2(dall,cbst,1)**2/dall*weight0
+    !weight=dnrm2(dall,cbst,1)**2/dall*weight0
+    weight=weight0
     nar_tmp=nar
     nars=0
 
