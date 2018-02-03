@@ -382,28 +382,7 @@ program SurfTomo
       cbst(i) = obst(i) - dsyn(i)
     enddo
 
-    ! write out rw, iw and cbst for testing
-    !open(44,file='iw.dat')
-    !write(44,*) nar
-    !do i = 2,nar+1
-    !write(44,*) iw(i)
-    !enddo
-    !do i = 1,nar
-    !write(44,*) col(i)
-    !enddo
-    !close(44)
 
-    !open(44,file='rw.dat')
-    !do i = 1,nar
-    !write(44,*) rw(i)
-    !enddo
-    !close(44)
-
-    !open(44,file='residal.dat')
-    !do i = 1,dall
-    !write(44,*) cbst(i)
-    !enddo
-    !close(44)
 
     !threshold = threshold0+(maxiter/2-iter)/3*0.5
     do i = 1,dall
@@ -418,6 +397,45 @@ program SurfTomo
     do i = 1,nar
       rw(i) = rw(i)*datweight(iw(1+i))
     enddo
+    
+    mean = sum(cbst(1:dall))/dall
+    std_devs = sqrt(sum(cbst(1:dall)**2)/dall - mean**2)
+    write(*,'(i2,a)'),iter,'th iteration...'
+    write(*,'(a,f7.3)'),'weight is:',weight
+    write(*,'(a,f8.1,a,f8.2,a,f8.3)'),'mean,std_devs and rms of &
+      residual: ',mean*1000,'ms ',1000*std_devs,'ms ',&
+      dnrm2(dall,cbst,1)/sqrt(real(dall))
+    write(66,'(i2,a)'),iter,'th iteration...'
+    write(66,'(a,f7.3)'),'weight is:',weight
+    write(66,'(a,f8.1,a,f8.2,a,f8.3)'),'mean,std_devs and rms of &
+      residual: ',mean*1000,'ms ',1000*std_devs,'ms ',&
+      dnrm2(dall,cbst,1)/sqrt(real(dall))
+
+    ! write out rw, iw and cbst for random matrix based inversion. Use nc format latter
+    if (rdm == 1) then
+    open(44,file='iw.dat')
+    write(44,*) nar
+    do i = 2,nar+1
+    write(44,*) iw(i)
+    enddo
+    do i = 1,nar
+    write(44,*) col(i)
+    enddo
+    close(44)
+
+    open(44,file='rw.dat')
+    do i = 1,nar
+    write(44,*) rw(i)
+    enddo
+    close(44)
+
+    open(44,file='residal.dat')
+    do i = 1,dall
+    write(44,*) cbst(i)
+    enddo
+    close(44)
+    stop
+    endif
 
     norm=0
     do i=1,nar
@@ -534,7 +552,7 @@ program SurfTomo
     do i =1,dall
        cbst(i)=cbst(i)/datweight(i)
     enddo
-
+ 
     mean = sum(cbst(1:dall))/dall
     std_devs = sqrt(sum(cbst(1:dall)**2)/dall - mean**2)
     write(*,'(i2,a)'),iter,'th iteration...'
