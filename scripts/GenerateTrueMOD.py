@@ -15,8 +15,9 @@ dep1=[0,0.2,0.4,0.6,0.8,1.1,1.4,1.8,2.5]
 anosize=0.5
 amplitude=0.4
 #end
-x=range(1,nx+1)
-y=range(1,ny+1)
+nmax = np.max([nx,ny])
+x=range(1,nmax+1)
+y=range(1,nmax+1)
 z=range(1,nz+1)
 z=np.ones(nz)
 bg=np.zeros((nz,nx,ny))
@@ -24,7 +25,7 @@ cross=np.zeros((nz,ny))
 vs1=np.zeros(nz)
 xy=np.kron(np.sin(anosize*np.array(y)),np.sin(anosize*np.array(x)))
 xyz=np.kron(z,xy)
-pxy=xyz.reshape(nz,nx,ny)
+pxy=xyz.reshape(nz,nmax,nmax)
 for k in range(nz):
   for j in range(ny):
     for i in range(nx):
