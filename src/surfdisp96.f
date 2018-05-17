@@ -56,7 +56,7 @@ c-----
         integer NL, NL2, NLAY
         parameter(NL=200,NLAY=200,NL2=NL+NL)
         integer NP
-        parameter (NP=60)
+        parameter (NP=80)
 
 c-----
 c     LIN - unit for FORTRAN read from terminal
@@ -500,7 +500,7 @@ c                 2 - Rayleigh Wave
 c     iflag   I*4 0 - Initialize
 c                 1 - Make model  for Love or Rayleigh Wave
 c-----
-        parameter(NL=200,NP=60)
+        parameter(NL=200,NP=80)
         real*4 d(NL),a(NL),b(NL),rho(NL),rtp(NL),dtp(NL),btp(NL)
         integer mmax,llw
 c        common/modl/ d,a,b,rho,rtp,dtp,btp
@@ -563,7 +563,7 @@ c     nev = 0 force interval halving
 c     nev = 1 permit neville iteration if conditions are proper
 c     nev = 2 neville iteration is being used
 c-----
-        parameter (NL=200,NP=60)
+        parameter (NL=200,NP=80)
         implicit double precision (a-h,o-z)
         real*4 d(NL),a(NL),b(NL),rho(NL),rtp(NL),dtp(NL),btp(NL)
         dimension x(20),y(20)
@@ -704,7 +704,7 @@ c
         function dltar1(wvno,omega,d,a,b,rho,rtp,dtp,btp,mmax,llw,twopi)
 c   find SH dispersion values.
 c
-        parameter (NL=200,NP=60)
+        parameter (NL=200,NP=80)
         implicit double precision (a-h,o-z)
         real*4 d(NL),a(NL),b(NL),rho(NL),rtp(NL),dtp(NL),btp(NL)
         integer llw,mmax
@@ -768,7 +768,7 @@ c
 c     &  a0,cpcq,cpy,cpz,cqw,cqx,xy,xz,wy,wz)
 c   find P-SV dispersion values.
 c
-        parameter (NL=200,NP=60)
+        parameter (NL=200,NP=80)
         implicit double precision (a-h,o-z)
         dimension e(5),ee(5),ca(5,5)
         real*4 d(NL),a(NL),b(NL),rho(NL),rtp(NL),dtp(NL),btp(NL)

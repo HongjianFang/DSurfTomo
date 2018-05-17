@@ -181,9 +181,9 @@ program SurfTomo
     if (checkstat > 0) stop 'error allocating RP'
     read(10,*)(tRc(i),i=1,kmaxRc)
     write(*,*)'Rayleigh wave phase velocity used,periods:(s)'
-    write(*,'(50f6.2)')(tRc(i),i=1,kmaxRc)
+    write(*,'(50f7.1)')(tRc(i),i=1,kmaxRc)
     write(66,*)'Rayleigh wave phase velocity used,periods:(s)'
-    write(66,'(50f6.2)')(tRc(i),i=1,kmaxRc)
+    write(66,'(50f7.1)')(tRc(i),i=1,kmaxRc)
   endif
   read(10,*)kmaxRg
   if(kmaxRg.gt.0)then
@@ -191,9 +191,9 @@ program SurfTomo
     if (checkstat > 0) stop 'error allocating RP'
     read(10,*)(tRg(i),i=1,kmaxRg)
     write(*,*)'Rayleigh wave group velocity used,periods:(s)'
-    write(*,'(50f6.2)')(tRg(i),i=1,kmaxRg)
+    write(*,'(50f7.1)')(tRg(i),i=1,kmaxRg)
     write(66,*)'Rayleigh wave group velocity used,periods:(s)'
-    write(66,'(50f6.2)')(tRg(i),i=1,kmaxRg)
+    write(66,'(50f7.1)')(tRg(i),i=1,kmaxRg)
   endif
   read(10,*)kmaxLc
   if(kmaxLc.gt.0)then
@@ -201,9 +201,9 @@ program SurfTomo
     if (checkstat > 0) stop 'error allocating RP'
     read(10,*)(tLc(i),i=1,kmaxLc)
     write(*,*)'Love wave phase velocity used,periods:(s)'
-    write(*,'(50f6.2)')(tLc(i),i=1,kmaxLc)
+    write(*,'(50f7.1)')(tLc(i),i=1,kmaxLc)
     write(66,*)'Love wave phase velocity used,periods:(s)'
-    write(66,'(50f6.2)')(tLc(i),i=1,kmaxLc)
+    write(66,'(50f7.1)')(tLc(i),i=1,kmaxLc)
   endif
   read(10,*)kmaxLg
   if(kmaxLg.gt.0)then
@@ -211,9 +211,9 @@ program SurfTomo
     if (checkstat > 0) stop 'error allocating RP'
     read(10,*)(tLg(i),i=1,kmaxLg)
     write(*,*)'Love wave group velocity used,periods:(s)'
-    write(*,'(50f6.2)')(tLg(i),i=1,kmaxLg)
+    write(*,'(50f7.1)')(tLg(i),i=1,kmaxLg)
     write(66,*)'Love wave group velocity used,periods:(s)'
-    write(66,'(50f6.2)')(tLg(i),i=1,kmaxLg)
+    write(66,'(50f7.1)')(tLg(i),i=1,kmaxLg)
   endif
   read(10,*)ifsyn
   read(10,*)noiselevel
@@ -333,7 +333,7 @@ program SurfTomo
   enddo
   close(10)
   write(*,*) 'grid points in depth direction:(km)'
-  write(*,'(50f6.2)') depz
+  write(*,'(50f7.1)') depz
 
 
 
@@ -411,7 +411,7 @@ program SurfTomo
 !      if(abs(cbst(i)) > threshold) then
 !        datweight(i) = exp(-(abs(cbst(i))-threshold))
 !      endif
-      datweight(i) = 1.0/(1+0.05*exp(cbst(i)**2*threshold0))
+      datweight(i) = 0.01+1.0/(1+0.05*exp(cbst(i)**2*threshold0))
       cbst(i) = cbst(i)*datweight(i)
     enddo
 

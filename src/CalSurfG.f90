@@ -92,6 +92,17 @@ subroutine depthkernel(nx,ny,nz,vel,pvRc,sen_vsRc,sen_vpRc,sen_rhoRc, &
           dlncg_dlnvs(nn,i) = (cg2(nn)-cg1(nn))/(dlnVs*vsz(i))
         enddo
 
+        !note here, no integral from z1 to z2 is needed. The grid based nodes 
+        ! have already taken into consideration of it. Layer based need integration.
+        ! Test passed
+        !if (i == 1) then
+        !  dlncg_dlnvs(1:kmaxRc,i) = dlncg_dlnvs(1:kmaxRc,i)*thkm(1)/2.0 
+        !else if (i == mmax) then
+        !  dlncg_dlnvs(1:kmaxRc,i) = dlncg_dlnvs(1:kmaxRc,i)*thkm(mmax-1)/2.0 
+        !else
+        !  dlncg_dlnvs(1:kmaxRc,i) = dlncg_dlnvs(1:kmaxRc,i)*(thkm(i-1)+thkm(i))/2.0 
+        !endif
+
 
         vpm(i) = vpz(i) - 0.5*dlnVp*vpz(i)
         call refineGrid2LayerMdl(minthk,mmax,depm,vpm,vsm,rhom,&
@@ -110,6 +121,16 @@ subroutine depthkernel(nx,ny,nz,vel,pvRc,sen_vsRc,sen_vpRc,sen_rhoRc, &
           !                cga = 0.5*(cg1(nn)+cg2(nn))
           dlncg_dlnvp(nn,i) = (cg2(nn)-cg1(nn))/(dlnVp*vpz(i))
         enddo
+
+
+        !if (i == 1) then
+        !  dlncg_dlnvp(1:kmaxRc,i) = dlncg_dlnvp(1:kmaxRc,i)*thkm(1)/2.0 
+        !else if (i == mmax) then
+        !  dlncg_dlnvp(1:kmaxRc,i) = dlncg_dlnvp(1:kmaxRc,i)*thkm(mmax-1)/2.0 
+        !else
+        !  dlncg_dlnvp(1:kmaxRc,i) = dlncg_dlnvp(1:kmaxRc,i)*(thkm(i-1)+thkm(i))/2.0 
+        !endif
+
         rhom(i) = rhoz(i) - 0.5*dlnrho*rhoz(i)
         call refineGrid2LayerMdl(minthk,mmax,depm,vpm,vsm,rhom,&
           rmax,rdep,rvp,rvs,rrho,rthk)
@@ -127,6 +148,15 @@ subroutine depthkernel(nx,ny,nz,vel,pvRc,sen_vsRc,sen_vpRc,sen_rhoRc, &
           !                cga = 0.5*(cg1(nn)+cg2(nn))
           dlncg_dlnrho(nn,i) = (cg2(nn)-cg1(nn))/(dlnrho*rhoz(i))
         enddo
+
+       ! if (i == 1) then
+       !   dlncg_dlnrho(1:kmaxRc,i) = dlncg_dlnrho(1:kmaxRc,i)*thkm(1)/2.0 
+       ! else if (i == mmax) then
+       !   dlncg_dlnrho(1:kmaxRc,i) = dlncg_dlnrho(1:kmaxRc,i)*thkm(mmax-1)/2.0 
+       ! else
+       !   dlncg_dlnrho(1:kmaxRc,i) = dlncg_dlnrho(1:kmaxRc,i)*(thkm(i-1)+thkm(i))/2.0 
+       ! endif
+
       enddo
       sen_vsRc((jj-1)*nx+ii,1:kmaxRc,1:mmax)=dlncg_dlnvs(1:kmaxRc,1:mmax)
       sen_vpRc((jj-1)*nx+ii,1:kmaxRc,1:mmax)=dlncg_dlnvp(1:kmaxRc,1:mmax)
@@ -1088,7 +1118,7 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
     iwave=1
     igr=0
     call depthkernel(nx,ny,nz,vels,pvLc,sen_vsLc,sen_vpLc, &
-      sen_rhoLc,iwave,igr,kmax,tLc,depz,minthk)
+      sen_rhoLc,iwave,igr,kmaxLc,tLc,depz,minthk)
   endif
 
   if(kmaxLg.gt.0) then
