@@ -121,7 +121,7 @@ program SurfTomo
 
   ! OUTPUT PROGRAM INFOMATION            
   write(*,*)
-  write(*,*),'                         S U R F  T O M O'
+  write(*,*),'                             DSurfTomo (v1.3)'
   write(*,*),'PLEASE contact Hongjain Fang &
     (fanghj@mail.ustc.edu.cn) if you find any bug'
   write(*,*)
