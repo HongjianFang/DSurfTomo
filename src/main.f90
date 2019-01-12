@@ -99,7 +99,7 @@ program SurfTomo
   integer writepath
   real averdws
   real maxnorm
-  real threshold,threshold0
+  real threshold0
 
 ! FOR MODEL VARIATION
   !------------------------------------------------
@@ -431,7 +431,7 @@ program SurfTomo
     enddo
     averdws=averdws/maxvp
     write(66,*)'Maximum and Average DWS values:',maxnorm,averdws
-    write(66,*)'Threshold is:',threshold
+    !write(66,*)'Threshold is:',threshold
 
     ! WRITE OUT RESIDUAL FOR THE FIRST AND LAST ITERATION
     if(iter.eq.1) then
@@ -514,10 +514,10 @@ program SurfTomo
     leniw = 2*nar+1
     lenrw = nar
     dv = 0
-    atol = 1e-3
-    btol = 1e-3
-    conlim = 1200
-    itnlim = 1000
+    atol = 1e-4
+    btol = 1e-4
+    conlim = 100
+    itnlim = 400
     istop = 0
     anorm = 0.0
     acond = 0.0
@@ -528,8 +528,15 @@ program SurfTomo
     call LSMR(m, n, leniw, lenrw,iw,rw,cbst, damp,&
       atol, btol, conlim, itnlim, localSize, nout,&
       dv, istop, itn, anorm, acond, rnorm, arnorm, xnorm)
-    if(istop==3) print*,'istop = 3, large condition number'
+    !if(istop==3) print*,'istop = 3, large condition number'
 
+    mean = sum(cbst(1:dall))/dall
+    std_devs = sqrt(sum(cbst(1:dall)**2)/dall - mean**2)
+    write(*,'(i2,a)'),iter,'th iteration...'
+    write(*,'(a,f7.3)'),'weight is:',weight
+    write(*,'(a,f8.1,a,f8.2,a,f8.3)'),'mean,std_devs and rms of &
+      residual after weighting: ',mean*1000,'ms ',1000*std_devs,'ms ',&
+      dnrm2(dall,cbst,1)/sqrt(real(dall))
 
     do i =1,dall
        cbst(i)=cbst(i)/datweight(i)
@@ -537,10 +544,9 @@ program SurfTomo
 
     mean = sum(cbst(1:dall))/dall
     std_devs = sqrt(sum(cbst(1:dall)**2)/dall - mean**2)
-    write(*,'(i2,a)'),iter,'th iteration...'
-    write(*,'(a,f7.3)'),'weight is:',weight
-    write(*,'(a,f8.1,a,f8.2,a,f8.3)'),'mean,std_devs and rms of &
-      residual: ',mean*1000,'ms ',1000*std_devs,'ms ',&
+    !write(*,'(i2,a)'),iter,'th iteration...'
+    !write(*,'(a,f7.3)'),'weight is:',weight
+    write(*,'(a,f8.1,a,f8.2,a,f8.3)'),'residual before weighting: ',mean*1000,'ms ',1000*std_devs,'ms ',&
       dnrm2(dall,cbst,1)/sqrt(real(dall))
     write(66,'(i2,a)'),iter,'th iteration...'
     write(66,'(a,f7.3)'),'weight is:',weight

@@ -1030,8 +1030,8 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
   integer writepath
   integer ig, igroup
 
-  gdx=5
-  gdz=5
+  gdx=8
+  gdz=8
   asgr=1
   sgdl=8
   sgs=8
@@ -1282,6 +1282,7 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
           ALLOCATE(ttnr(idm2,idm1))
           ALLOCATE(nstsr(idm2,idm1))
         ENDIF
+        !ttnr(1:nnzb,1:nnxb)=ttn(1:nnzb,1:nnxb)
         ttnr=ttn
         nstsr=nsts
         ogx=vnl
