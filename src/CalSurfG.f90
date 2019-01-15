@@ -940,7 +940,7 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
     goxdf,gozdf,dvxdf,dvzdf,kmaxRc,kmaxRg,kmaxLc,kmaxLg, &
     tRc,tRg,tLc,tLg,wavetype,igrt,periods,depz,minthk, &
     scxf,sczf,rcxf,rczf,nrc1,nsrcsurf1,kmax,nsrcsurf,nrcf, &
-    nar,writepath)
+    nar)
   USE globalp
   USE traveltime
   IMPLICIT NONE
@@ -1027,7 +1027,6 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
   integer ii,jj,kk,nn,istep
   integer level,maxlevel,maxleveld,HorizonType,VerticalType,PorS
   real,parameter::ftol=1e-4
-  integer writepath
   integer ig, igroup
 
   gdx=8
@@ -1382,7 +1381,7 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
         call gridder(velf0)
         endif
         count11=count11+1
-        CALL rpaths(x,z,fdm,rcxf(istep,srcnum,knumi),rczf(istep,srcnum,knumi),writepath)
+        CALL rpaths(x,z,fdm,rcxf(istep,srcnum,knumi),rczf(istep,srcnum,knumi))
         row(1:nparpi)=0.0
         do jj=1,nvz
           do kk=1,nvx
@@ -1747,7 +1746,7 @@ END SUBROUTINE srtimes
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !SUBROUTINE rpaths(wrgf,csid,cfd,scx,scz)
 !SUBROUTINE rpaths()
-SUBROUTINE rpaths(scx,scz,fdm,surfrcx,surfrcz,writepath)
+SUBROUTINE rpaths(scx,scz,fdm,surfrcx,surfrcz)
   USE globalp
   IMPLICIT NONE
   INTEGER, PARAMETER :: i5=SELECTED_REAL_KIND(5,10)
@@ -1768,7 +1767,6 @@ SUBROUTINE rpaths(scx,scz,fdm,surfrcx,surfrcz,writepath)
   !fang!------------------------------------------------
   real fdm(0:nvz+1,0:nvx+1)
   REAL(KIND=i10) surfrcx,surfrcz
-  integer writepath
   !fang!------------------------------------------------
   !
   ! ipx,ipz = Coordinates of cell containing current point
@@ -2253,14 +2251,14 @@ SUBROUTINE rpaths(scx,scz,fdm,surfrcx,surfrcz,writepath)
   !  Write ray paths to output file
   !
   !fang!   IF(wrgf.EQ.csid.OR.wrgf.LT.0)THEN
-  if(writepath == 1) then
-    WRITE(40,*)'#',nrp
-    DO j=1,nrp
-      rayx=(pi/2-rgx(j))*180.0/pi
-      rayz=rgz(j)*180.0/pi
-      WRITE(40,*)rayx,rayz
-    ENDDO
-  endif
+  !if(writepath == 1) then
+  !  WRITE(40,*)'#',nrp
+  !  DO j=1,nrp
+  !    rayx=(pi/2-rgx(j))*180.0/pi
+  !    rayz=rgz(j)*180.0/pi
+  !    WRITE(40,*)rayx,rayz
+  !  ENDDO
+  !endif
   !fang!   ENDIF
   !
   !  Write partial derivatives to output file
