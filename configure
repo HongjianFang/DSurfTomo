@@ -3,14 +3,14 @@
 # written by Hongjian Fang(fanghj@mail.ustc.edu.cn)
 import os
 if 'bin' in os.listdir('.'):
- print 'installation beginning'
+ print('installation beginning')
 else:
- print 'installation beginning'
+ print('installation beginning')
  os.mkdir('bin')
 os.chdir('src')
 os.system('make clean')
 os.system('make')
 os.system('cp DSurfTomo ../bin')
-print '--------------------------------------'
-print 'Finishing DSurfTomo compiling'
-print '--------------------------------------'
+print('--------------------------------------')
+print('Finishing DSurfTomo compiling')
+print('--------------------------------------')
