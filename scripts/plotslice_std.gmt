@@ -1,0 +1,48 @@
+#!/bin/csh
+
+#-----------------------------------------------------------
+# 2015-06-08 Hongjian Fang
+# how to run:
+# ./plotslice.gmt ModelFile depth1 depth2 depth3 depth4, e.g.
+# csh plotslice.gmt SurfTomo.in.tvMeasure.dat 0.2 0.4 0.8 1.4
+#-----------------------------------------------------------
+
+gmt set FONT_ANNOT_PRIMARY 12
+gmt set FONT_LABEL 12
+#gmt set FRAME_WIDTH=0.1c
+#gmt set LABEL_OFFSET=0.1c
+#gmt set LABEL_FONT_SIZE=5p
+#gmt set TICK_LENGTH=0.1c
+#gmt set TICK_PEN=0.3p
+set inp3D  = $1
+set ps   = horizVsnew.inv_std.ps
+set J      = -JM2i     #size for plot
+set cpt = slice.cpt
+
+# start
+gmt makecpt -Cgray -D -I -T0.0/0.5/0.05   > $cpt #velocity boundary
+set RMAP = `gmt gmtinfo -C $inp3D | awk '{print "-R"$1"/"$2"/"$3"/"$4}'`
+gmt psbasemap $RMAP $J -Ba0.1f0.05Wsen -P -K -Y5i >$ps
+awk '{if($3==depth1) print $1,$2,$4}' depth1=$2 $inp3D|gmt xyz2grd -R -I0.017/0.015 -Gtmp.grd 
+gmt grdimage tmp.grd $J $RMAP -BSenW -E100 -C$cpt -O -K >> $ps
+rm -rf tmp.grd
+#gmt psscale -Cslice.cpt -Ba0.1f0.05:'S velocity (km/s)': -D1.0i/-0.15i/3.00/0.2h  -O -K -P >> $ps
+
+#gmt makecpt -Cseis -D -T0.8/1.8/0.1   > $cpt #velocity boundary
+gmt psbasemap $RMAP $J -Ba0.1f0.05nwse -P -K -O -X2.3i >>$ps
+awk '{if($3==depth2) print $1,$2,$4}' depth2=$3 $inp3D|gmt xyz2grd -R -I0.017/0.015 -Gtmp.grd 
+gmt grdimage tmp.grd $J $RMAP -BSenW -E100 -C$cpt -O -K >> $ps
+#gmt psscale -Cslice.cpt -Ba0.2f0.1:'S velocity (km/s)': -D1.0i/-0.15i/3.00/0.2h  -O -K -P >> $ps
+
+#gmt makecpt -Cseis -D -T1.1/2.0/0.1  > $cpt #velocity boundary
+gmt psbasemap $RMAP $J -Ba0.1f0.05WneS -P -K -O -Y-2.3i -X-2.3i >>$ps
+awk '{if($3==depth2) print $1,$2,$4}' depth2=$4 $inp3D|gmt xyz2grd -R -I0.017/0.015 -Gtmp.grd 
+gmt grdimage tmp.grd $J $RMAP -BSenW -E100 -C$cpt -O -K >> $ps
+#gmt psscale -Cslice.cpt -Ba0.2f0.1:'S velocity (km/s)': -D1.0i/-0.25i/3.00/0.2h  -O -K -P >> $ps
+
+#gmt makecpt -Cseis -D -T1.3/2.4/0.1   > $cpt #velocity boundary
+gmt psbasemap $RMAP $J -Ba0.1f0.05Swne -P -K -O -X2.3i >>$ps
+awk '{if($3==depth2) print $1,$2,$4}' depth2=$5 $inp3D|gmt xyz2grd -R -I0.017/0.015 -Gtmp.grd 
+gmt grdimage tmp.grd $J $RMAP -BSenW -E100 -C$cpt -O -K >> $ps
+gmt psscale -Cslice.cpt -Ba0.2f0.1:'Vs std (km/s)': -D1.0i/-0.35i/3.00/0.2h  -O  -P >> $ps
+

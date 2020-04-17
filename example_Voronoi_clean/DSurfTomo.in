@@ -6,7 +6,7 @@ surfdataTB.dat                   c: data file
 25.2  121.35                     c: goxd gozd (upper left point,[lat,lon])
 0.015 0.017                      c: dvxd dvzd (grid interval in lat and lon direction)
 20                               c: max(sources, receivers)
-4.0  0.1                         c: weight damp
+4.0  1.0                         c: weight damp
 3                                c: sablayers (for computing depth kernel, 2~5)
 0.5 2.8                          c: minimum velocity, maximum velocity (a priori information)
 10                               c: maximum iteration
@@ -18,4 +18,5 @@ surfdataTB.dat                   c: data file
 0                                c: kmaxLg
 0                                c: synthetic flag(0:real data,1:synthetic)
 0.02                             c: noiselevel
-0.5                              c: threshold
+0.05                             c: threshold
+1 100 50                         c: vorotomo,ncells,nrelizations

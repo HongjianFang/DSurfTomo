@@ -20,6 +20,7 @@
 program SurfTomo
         use lsmrModule, only:lsmr
         use  lsmrblasInterface, only : dnrm2
+        use omp_lib
         implicit none
 
         ! VARIABLE DEFINE
@@ -63,7 +64,8 @@ program SurfTomo
         integer,dimension(:,:),allocatable::periods
         real,dimension(:),allocatable::rw
         integer,dimension(:),allocatable::iw,col
-        real,dimension(:),allocatable::dv,norm
+        real,dimension(:),allocatable::dv,norm,dvsub,dvstd,dvall
+!        real,dimension(:),allocatable::dvall
         real,dimension(:,:,:),allocatable::vsf
         real,dimension(:,:,:),allocatable::vsftrue
         character strf
@@ -100,6 +102,9 @@ program SurfTomo
         real maxnorm
         real threshold0
 
+        !For Poisson Voronoi inverison
+        integer iproj,vorotomo,ncells,nrealizations,idx
+        real hvratio
 
         ! OPEN FILES FIRST TO OUTPUT THE PROCESS
         nout=36
@@ -107,9 +112,11 @@ program SurfTomo
 
         ! OUTPUT PROGRAM INFOMATION            
         write(*,*)
-        write(*,*),'                             DSurfTomo (v1.3)'
-        write(*,*),'PLEASE contact Hongjain Fang &
-                (fanghj@mail.ustc.edu.cn) if you find any bug'
+        write(*,*) '                             DSurfTomo (v2.0)'
+        !write(*,*) 'PLEASE contact Hongjain Fang &
+        !        (fanghj@mail.ustc.edu.cn) if you find any bug'
+        write(*,*) 'For bug report, PLEASE contact Hongjain Fang &
+                (fanghj1990@gmail.com)'
         write(*,*)
 
         ! READ INPUT FILE
@@ -151,8 +158,8 @@ program SurfTomo
         write(logfile,'(a,a)')trim(inputfile),'.log' 
         open(66,file=logfile)
         write(66,*)
-        write(66,*),'                         S U R F  T O M O'
-        write(66,*),'PLEASE contact Hongjain Fang &
+        write(66,*)'                         S U R F  T O M O'
+        write(66,*)'PLEASE contact Hongjain Fang &
                 (fanghj@mail.ustc.edu.cn) if you find any bug'
         write(66,*)
         write(66,*) 'model origin:latitude,longitue'
@@ -204,6 +211,8 @@ program SurfTomo
         read(10,*)ifsyn
         read(10,*)noiselevel
         read(10,*) threshold0
+
+        read(10,*) vorotomo,ncells,nrealizations!,hvratio
         close(10)
         nrc=nsrc
         kmax=kmaxRc+kmaxRg+kmaxLc+kmaxLg
@@ -281,7 +290,8 @@ program SurfTomo
         allocate(depz(nz), stat=checkstat)
         maxnar = spfra*dall*nx*ny*nz!sparsity fraction
         maxvp = (nx-2)*(ny-2)*(nz-1)
-        allocate(dv(maxvp), stat=checkstat)
+        allocate(dv(maxvp),dvsub(maxvp),dvstd(maxvp),dvall(maxvp*nrealizations), stat=checkstat)
+!        allocate(dvall(maxvp*nrealizations),stats=checkstat)
         allocate(norm(maxvp), stat=checkstat)
         allocate(vsf(nx,ny,nz), stat=checkstat)
         allocate(vsftrue(nx,ny,nz), stat=checkstat)
@@ -302,7 +312,7 @@ program SurfTomo
                 stat=checkstat)
 
         ! MEASUREMENTS STATISTICS AND READ INITIAL MODEL           
-        write(*,'(a,i7)') 'Number of all measurements',dall
+        write(*,'(a,i7)') ' Number of all measurements',dall
 
         open(10,file='MOD',status='old')
         read(10,*) (depz(i),i=1,nz)
@@ -317,7 +327,7 @@ program SurfTomo
 
         ! CHECKERBOARD TEST
         if (ifsyn == 1) then
-                write(*,*) 'Checkerboard Resolution Test Begin'
+                write(*,*) 'Synthetic Test Begin'
                 vsftrue = vsf
 
                 open(11,file='MOD.true',status='old')
@@ -397,6 +407,36 @@ program SurfTomo
 
 
         ! ADDING REGULARIZATION TERM
+        if (vorotomo /= 0) then
+
+            hvratio = dvxd*(nx-3)*111.19/depz(nz-1)
+            dv = 0
+            dvstd = 0
+            leniw = 2*nar+1
+            lenrw = nar
+            iw(1)=nar
+            iw(nar+2:2*nar+1) = col(1:nar)
+            !$omp parallel &
+            !$omp default(private) &
+            !$omp shared(leniw,lenrw,iw,rw,cbst,goxd,gozd,dvxd,dvzd,depz,maxvp) &
+            !$omp shared(nx,ny,nz,dall,ncells,hvratio,damp,nrealizations,dvall)
+            !$omp do
+            do iproj = 1,nrealizations
+            call voronoiproj(leniw,lenrw,iw,rw,cbst,goxd,dvxd,gozd,dvzd,depz,&
+                       nx,ny,nz,dall,ncells,hvratio,damp,iproj,dvsub)
+            dvall((iproj-1)*maxvp+1:iproj*maxvp) = dvsub(1:maxvp)
+            enddo
+            !$omp end do
+            !$omp end parallel
+            do iproj = 1,nrealizations
+            dvsub = dvall((iproj-1)*maxvp+1:iproj*maxvp)!:,iproj)
+            dv = dv+dvsub
+            dvstd = dvstd+dvsub**2
+            enddo
+            dv = dv/nrealizations
+            dvstd = sqrt(dvstd/nrealizations-dv**2)
+        else
+
         weight=weight0
         nar_tmp=nar
         nars=0
@@ -472,11 +512,13 @@ program SurfTomo
                 atol, btol, conlim, itnlim, localSize, nout,&
                 dv, istop, itn, anorm, acond, rnorm, arnorm, xnorm)
 
+        endif  ! end vorotomo
+        
         mean = sum(cbst(1:dall))/dall
         std_devs = sqrt(sum(cbst(1:dall)**2)/dall - mean**2)
-        write(*,'(i2,a)'),iter,'th iteration...'
-        write(*,'(a,f7.3)'),'weight is:',weight
-        write(*,'(a,f8.1,a,f8.2,a,f8.3)'),'mean,std_devs and rms of &
+        write(*,'(i2,a)')iter,'th iteration...'
+!        write(*,'(a,f7.3)')'weight is:',weight
+        write(*,'(a,f8.1,a,f8.2,a,f8.3)')' mean,std_devs and rms of &
                 residual after weighting: ',mean*1000,'ms ',1000*std_devs,'ms ',&
                 dnrm2(dall,cbst,1)/sqrt(real(dall))
 
@@ -486,17 +528,17 @@ program SurfTomo
 
         mean = sum(cbst(1:dall))/dall
         std_devs = sqrt(sum(cbst(1:dall)**2)/dall - mean**2)
-        write(*,'(a,f8.1,a,f8.2,a,f8.3)'),'residual before weighting: ',mean*1000,'ms ',1000*std_devs,'ms ',&
+        write(*,'(a,f8.1,a,f8.2,a,f8.3)')' residual before weighting: ',mean*1000,'ms ',1000*std_devs,'ms ',&
                 dnrm2(dall,cbst,1)/sqrt(real(dall))
-        write(66,'(i2,a)'),iter,'th iteration...'
-        write(66,'(a,f7.3)'),'weight is:',weight
-        write(66,'(a,f8.1,a,f8.2,a,f8.3)'),'mean,std_devs and rms of &
+        write(66,'(i2,a)')iter,'th iteration...'
+!        write(66,'(a,f7.3)')'weight is:',weight
+        write(66,'(a,f8.1,a,f8.2,a,f8.3)')'mean,std_devs and rms of &
                 residual: ',mean*1000,'ms ',1000*std_devs,'ms ',&
                 dnrm2(dall,cbst,1)/sqrt(real(dall))
 
-        write(*,'(a,2f7.4)'),'min and max velocity variation ',&
+        write(*,'(a,2f7.4)')' min and max velocity variation ',&
                 minval(dv),maxval(dv)
-        write(66,'(a,2f7.4)'),'min and max velocity variation ',&
+        write(66,'(a,2f7.4)')'min and max velocity variation ',&
                 minval(dv),maxval(dv)
 
         do k=1,nz-1
@@ -531,8 +573,8 @@ program SurfTomo
 
         ! OUTPUT THE VELOCITY MODEL
 
-        write(*,*),'Program finishes successfully'
-        write(66,*),'Program finishes successfully'
+        write(*,*)'Program finishes successfully'
+        write(66,*)'Program finishes successfully'
 
         if(ifsyn == 1) then
                 open(65,file='Vs_model.real')
@@ -548,13 +590,13 @@ program SurfTomo
                 enddo
                 close(65)
                 close(63)
-                write(*,*),'Output True velocity model &
+                write(*,*)'Output True velocity model &
                         to Vs_model.real'
-                write(*,*),'Output inverted shear velocity model &
+                write(*,*)'Output inverted shear velocity model &
                         to ',outsyn
-                write(66,*),'Output True velocity model &
+                write(66,*)'Output True velocity model &
                         to Vs_model.real'
-                write(66,*),'Output inverted shear velocity model &
+                write(66,*)'Output inverted shear velocity model &
                         to ',outsyn
         else
                 write(outmodel,'(a,a)') trim(inputfile),'Measure.dat'
@@ -567,10 +609,23 @@ program SurfTomo
                 enddo
                 enddo
                 close(64)
-                write(*,*),'Output inverted shear velocity model &
+                write(*,*)'Output inverted shear velocity model &
                         to ',outmodel
-                write(66,*),'Output inverted shear velocity model &
+                write(66,*)'Output inverted shear velocity model &
                         to ',outmodel
+
+                write(outmodel,'(a,a)') trim(inputfile),'Measure_std.dat'
+                open(64,file=outmodel)
+                do k=1,nz-1
+                do j=1,ny-2
+                do i=1,nx-2
+                idx = (k-1)*(nx-2)*(ny-2)+(j-1)*(nx-2)+i
+                write(64,'(5f9.3)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),dvstd(idx)
+                enddo
+                enddo
+                enddo
+                close(64)
+ 
         endif
 
         close(40)
@@ -588,7 +643,7 @@ program SurfTomo
         deallocate(rw)
         deallocate(iw,col)
         deallocate(cbst,wt,dtres,datweight)
-        deallocate(dv)
+        deallocate(dv,dvsub,dvstd,dvall)
         deallocate(norm)
         deallocate(vsf)
         deallocate(vsftrue)

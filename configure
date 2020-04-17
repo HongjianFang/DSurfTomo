@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 # this is a script to install surf_tomo and surf_tomo_syn in your system
 # written by Hongjian Fang(fanghj@mail.ustc.edu.cn)
+
 import os
 if 'bin' in os.listdir('.'):
- print 'installation beginning'
+    print ('Installation beginning')
 else:
- print 'installation beginning'
- os.mkdir('bin')
+     print ('Installation beginning')
+     os.mkdir('bin')
 os.chdir('src')
 os.system('make clean')
 os.system('make')
 os.system('cp DSurfTomo ../bin')
-print '--------------------------------------'
-print 'Finishing DSurfTomo compiling'
-print '--------------------------------------'
+print ('--------------------------------------')
+print ('DSurfTomo compiling Finished')
+print ('--------------------------------------')

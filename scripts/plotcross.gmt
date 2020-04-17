@@ -1,0 +1,69 @@
+#!/bin/csh
+
+#-----------------------------------------------------------
+# 2015-06-08 Hongjian Fang
+# step 1: get velicoty along the track from each depth-layer
+# step 2: combine tracks into 2D profile
+#-----------------------------------------------------------
+
+# change the following parameters according to your case
+# start
+set inp3D  = DSurfTomo.inMeasure.dat
+set pstart = 121.4/25.1      #start point for 2D profile 
+set pend   = 121.55/25.1    #end point for 2D profile 
+set pstart2 = 121.5/25.0      #start point for 2D profile 
+set pend2   = 121.5/25.14    #end point for 2D profile 
+set ddint = 0.017/0.015	  #grid interval
+# over
+set diInt  = 0.5	    #distance interval (km)
+set J      = -JX6.0i/-1.5i    #size for plot
+set cpt = slice.cpt
+set ps   = figcross.ps
+gmt makecpt -Cjet -I -T0.5/2.5/0.1   > $cpt #velocity boundary
+
+# start
+set pro2d  = tmp.profile.xzv
+set RMAP = `gmt gmtinfo -C $inp3D | awk '{print "-R"$1"/"$2"/"$3"/"$4}'`
+rm -fr $pro2d
+
+foreach layer(`awk '{print $3}' $inp3D| uniq`)
+  set llayer = `echo $layer | awk '{printf "%04d",$1*1000}'`
+  awk '{if($3==j) print $1,$2,$4}' j=$layer $inp3D |gmt surface -Gtmp.grd $RMAP -I$ddint -T0
+  # be careful -I: grid spacing for x/y
+  gmt project -C$pstart -E$pend -G$diInt -Q > track.dat
+  gmt grdtrack track.dat -Gtmp.grd | awk '{print $3,j,$4}' j=$layer > tmp.D$llayer
+  cat tmp.D$llayer >> $pro2d
+end
+#
+set RMAP = `gmt gmtinfo -C $pro2d | awk '{print "-R"$1"/"$2"/"$3"/"$4}'`
+gmt surface $pro2d -Gtmp.grd $RMAP -I$ddint -T0
+#gmt grdfilter tmp.grd -D0 -Fg4 -Gtmpf.grd
+gmt grdimage tmp.grd $J $RMAP -Bf2.5a5:'Distance (km)':/f0.5a1:'Depth (km)':SenW -C$cpt -K -Y5.2i> $ps
+#gmt psscale -Cslice.cpt -Ba0.5f0.25:'Vs': -D2.5i/-0.7i/6.00/0.2h  -O -K -P >> $ps
+
+rm -fr tmp.D* tmp.grd tmp.profile.xzv track.dat  
+
+# start
+set pro2d  = tmp.profile.xzv
+set RMAP = `gmt gmtinfo -C $inp3D | awk '{print "-R"$1"/"$2"/"$3"/"$4}'`
+rm -fr $pro2d
+
+foreach layer(`awk '{print $3}' $inp3D| uniq`)
+  set llayer = `echo $layer | awk '{printf "%04d",$1*1000}'`
+  awk '{if($3==j) print $1,$2,$4}' j=$layer $inp3D |gmt surface -Gtmp.grd $RMAP -I$ddint -T0
+  # be careful -I: grid spacing for x/y
+  gmt project -C$pstart2 -E$pend2 -G$diInt -Q > track.dat
+  gmt grdtrack track.dat -Gtmp.grd | awk '{print $3,j,$4}' j=$layer > tmp.D$llayer
+  cat tmp.D$llayer >> $pro2d
+end
+#
+set RMAP = `gmt gmtinfo -C $pro2d | awk '{print "-R"$1"/"$2"/"$3"/"$4}'`
+gmt surface $pro2d -Gtmp.grd $RMAP -I$ddint -T0
+#gmt grdfilter tmp.grd -D0 -Fg4 -Gtmpf.grd
+gmt grdimage tmp.grd $J $RMAP -Bf2.5a5:'Distance (km)':/f0.5a1:'Depth (km)':SenW -C$cpt -K -O -Y-2.0i>> $ps
+gmt psscale -Cslice.cpt -Ba0.5f0.25:'Vs': -D2.5i/-0.7i/6.00/0.2h  -O -P >> $ps
+
+rm -fr tmp.D* tmp.grd tmp.profile.xzv track.dat  
+p
+ps2pdf $ps
+
