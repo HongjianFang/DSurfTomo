@@ -140,8 +140,8 @@ subroutine voronoiproj(leniw,lenrw,iw,rw,dres,goxd,dvxd,gozd,dvzd,depz,&
 
       conlim = 50
       itnlim = 100
-      atol = 1e-2
-      btol = 1e-3
+      atol = 1e-3/((dvxd+dvzd)*111.19/2.0*0.1) !1e-2
+      btol = 1e-3/(dvxd*nx*111.19/3.0)!1e-3
       istop = 0
       anorm = 0.0
       acond = 0.0
@@ -152,14 +152,14 @@ subroutine voronoiproj(leniw,lenrw,iw,rw,dres,goxd,dvxd,gozd,dvzd,depz,&
       ! using lsmr to solve for the projection coefficients
       !print*, 'LSMR beginning ...'
 
-      nout = -1
-      !nout = 36
-      !open(nout,file='lsmrout_sub.txt')
+      !nout = -1
+      nout = 36
+      open(nout,file='lsmrout_sub.txt')
 
       call LSMR(nd, ncells, leniwgp, lenrwgp,iwgp,rwgp,dres,damp,&
       atol, btol, conlim, itnlim, localSize,nout,&
       xunknown, istop, itn, anorm, acond,rnorm, arnorm, xnorm)
-      !close(nout)
+      close(nout)
       do ii = 1,ncells
         xunknown(ii) = xunknown(ii)/norm(ii)
       enddo

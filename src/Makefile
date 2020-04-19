@@ -1,6 +1,6 @@
 CMD = DSurfTomo
 FC = gfortran
-FFLAGS  = -O3 -ffixed-line-length-none -ffloat-store\
+FFLAGS  = -O -ffixed-line-length-none -ffloat-store\
            -fbounds-check -m64 -mcmodel=medium
 F90SRCS = lsmrDataModule.f90 lsmrblasInterface.f90\
           lsmrblas.f90 lsmrModule.f90 delsph.f90\

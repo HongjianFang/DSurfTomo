@@ -138,7 +138,7 @@ program SurfTomo
         read(10,'(a30)')dummy
         read(10,'(a30)')dummy
         read(10,'(a30)')dummy
-        read(10,*)datafile
+        read(10,*) datafile
         read(10,*) nx,ny,nz
         read(10,*) goxd,gozd
         read(10,*) dvxd,dvzd
@@ -289,6 +289,7 @@ program SurfTomo
         close(87)
         allocate(depz(nz), stat=checkstat)
         maxnar = spfra*dall*nx*ny*nz!sparsity fraction
+        if (maxnar<0) print*, 'number overflow, decrease your sparsefrac'
         maxvp = (nx-2)*(ny-2)*(nz-1)
         allocate(dv(maxvp),dvsub(maxvp),dvstd(maxvp),dvall(maxvp*nrealizations), stat=checkstat)
 !        allocate(dvall(maxvp*nrealizations),stats=checkstat)
@@ -416,6 +417,7 @@ program SurfTomo
             lenrw = nar
             iw(1)=nar
             iw(nar+2:2*nar+1) = col(1:nar)
+            print*,'no. of nonzero:',nar,minval(cbst),maxval(cbst)
             !$omp parallel &
             !$omp default(private) &
             !$omp shared(leniw,lenrw,iw,rw,cbst,goxd,gozd,dvxd,dvzd,depz,maxvp) &
@@ -497,8 +499,10 @@ program SurfTomo
         leniw = 2*nar+1
         lenrw = nar
         dv = 0
-        atol = 1e-4
-        btol = 1e-4
+        !atol = 1e-4
+        !btol = 1e-4
+        atol = 1e-3/((dvxd+dvzd)*111.19/2.0*0.1) !1e-2
+        btol = 1e-3/(dvxd*nx*111.19/3.0)!1e-3
         conlim = 100
         itnlim = 400
         istop = 0

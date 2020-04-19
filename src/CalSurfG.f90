@@ -1098,6 +1098,7 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
   if(kmaxRc.gt.0) then
     iwave=2
     igr=0
+    print*,'Rayleigh wave phase velocity depth kernel'
     call depthkernel(nx,ny,nz,vels,pvRc,sen_vsRc,sen_vpRc, &
       sen_rhoRc,iwave,igr,kmaxRc,tRc,depz,minthk)
   endif
@@ -1109,6 +1110,7 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
     call caldespersion(nx,ny,nz,vels,pvRc, &
         iwave,igr,kmax,tRg,depz,minthk)
     igr=1
+    print*,'Rayleigh wave group velocity depth kernel'
     call depthkernel(nx,ny,nz,vels,pvRg,sen_vsRg,sen_vpRg, &
       sen_rhoRg,iwave,igr,kmaxRg,tRg,depz,minthk)
   endif
@@ -1377,9 +1379,9 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
         !
         if (igrt(srcnum,knumi) == 0 .or. (ig == 2 .and. igrt(srcnum,knumi) == 1)) then
         ! a little stupid, remember to change latter
-        if (igrt(srcnum,knumi) == 1) then
-        call gridder(velf0)
-        endif
+        !if (igrt(srcnum,knumi) == 1) then
+        !call gridder(velf0)
+        !endif
         count11=count11+1
         CALL rpaths(x,z,fdm,rcxf(istep,srcnum,knumi),rczf(istep,srcnum,knumi))
         row(1:nparpi)=0.0
