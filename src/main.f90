@@ -410,6 +410,7 @@ program SurfTomo
         ! ADDING REGULARIZATION TERM
         if (vorotomo /= 0) then
 
+            nrow = 0
             hvratio = dvxd*(nx-3)*111.19/depz(nz-1)
             dv = 0
             dvstd = 0
@@ -420,7 +421,8 @@ program SurfTomo
             do i = 1,nar
             nrow(iw(1+i)) = nrow(iw(1+i))+1
             enddo
-            print*,'no. of nonzero:',nar,minval(cbst),maxval(cbst)
+!            print*,sum(nrow(1:dall)),nar
+!            print*,'no. of nonzero:',nar!,minval(cbst),maxval(cbst)
             !$omp parallel &
             !$omp default(private) &
             !$omp shared(leniw,lenrw,col,nrow,rw,cbst,goxd,gozd,dvxd,dvzd,depz,maxvp) &
