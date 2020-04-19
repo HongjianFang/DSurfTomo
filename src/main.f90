@@ -63,7 +63,7 @@ program SurfTomo
         integer,dimension(:),allocatable::nsrc1
         integer,dimension(:,:),allocatable::periods
         real,dimension(:),allocatable::rw
-        integer,dimension(:),allocatable::iw,col
+        integer,dimension(:),allocatable::iw,col,nrow
         real,dimension(:),allocatable::dv,norm,dvsub,dvstd,dvall
 !        real,dimension(:),allocatable::dvall
         real,dimension(:,:,:),allocatable::vsf
@@ -305,7 +305,7 @@ program SurfTomo
         if(checkstat > 0)then
                 write(6,*)'error with allocate: integer iw'
         endif
-        allocate(col(maxnar), stat=checkstat)
+        allocate(col(maxnar),nrow(dall), stat=checkstat)
         if(checkstat > 0)then
                 write(6,*)'error with allocate:  integer iw'
         endif
@@ -417,14 +417,17 @@ program SurfTomo
             lenrw = nar
             iw(1)=nar
             iw(nar+2:2*nar+1) = col(1:nar)
+            do i = 1,nar
+            nrow(iw(1+i)) = nrow(iw(1+i))+1
+            enddo
             print*,'no. of nonzero:',nar,minval(cbst),maxval(cbst)
             !$omp parallel &
             !$omp default(private) &
-            !$omp shared(leniw,lenrw,iw,rw,cbst,goxd,gozd,dvxd,dvzd,depz,maxvp) &
+            !$omp shared(leniw,lenrw,col,nrow,rw,cbst,goxd,gozd,dvxd,dvzd,depz,maxvp) &
             !$omp shared(nx,ny,nz,dall,ncells,hvratio,damp,nrealizations,dvall)
             !$omp do
             do iproj = 1,nrealizations
-            call voronoiproj(leniw,lenrw,iw,rw,cbst,goxd,dvxd,gozd,dvzd,depz,&
+            call voronoiproj(leniw,lenrw,col,nrow,rw,cbst,goxd,dvxd,gozd,dvzd,depz,&
                        nx,ny,nz,dall,ncells,hvratio,damp,iproj,dvsub)
             dvall((iproj-1)*maxvp+1:iproj*maxvp) = dvsub(1:maxvp)
             enddo
@@ -618,6 +621,7 @@ program SurfTomo
                 write(66,*)'Output inverted shear velocity model &
                         to ',outmodel
 
+                if (vorotomo /= 0) then
                 write(outmodel,'(a,a)') trim(inputfile),'Measure_std.dat'
                 open(64,file=outmodel)
                 do k=1,nz-1
@@ -629,6 +633,7 @@ program SurfTomo
                 enddo
                 enddo
                 close(64)
+                endif
  
         endif
 
@@ -645,7 +650,7 @@ program SurfTomo
         deallocate(wavetype,igrt,nrc1)
         deallocate(nsrc1,periods)
         deallocate(rw)
-        deallocate(iw,col)
+        deallocate(iw,col,nrow)
         deallocate(cbst,wt,dtres,datweight)
         deallocate(dv,dvsub,dvstd,dvall)
         deallocate(norm)

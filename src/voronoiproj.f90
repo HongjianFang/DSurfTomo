@@ -1,11 +1,12 @@
-subroutine voronoiproj(leniw,lenrw,iw,rw,dres,goxd,dvxd,gozd,dvzd,depz,&
+subroutine voronoiproj(leniw,lenrw,colg,nrow,rw,dres,goxd,dvxd,gozd,dvzd,depz,&
                        nx,ny,nz,nd,ncells,hvratio,damp,iproj,dv)
       use lsmrModule, only:lsmr
 
       implicit none
       integer leniw,lenrw
       integer nx,ny,nz
-      integer iw(leniw)
+!      integer iw(leniw)
+      integer colg(leniw),nrow(nd)
       real depz(nz)
       real rw(lenrw)
       integer ncells
@@ -38,6 +39,7 @@ subroutine voronoiproj(leniw,lenrw,iw,rw,dres,goxd,dvxd,gozd,dvzd,depz,&
       real xnorm
       integer localSize,nout,itn
       integer leniw_p,lenrw_p,leniwgp,lenrwgp
+      integer start
 
       allocate(lat(nx-2),lon(ny-2),rad(nz-1))
       ndim = (nx-2)*(ny-2)*(nz-1)
@@ -102,9 +104,13 @@ subroutine voronoiproj(leniw,lenrw,iw,rw,dres,goxd,dvxd,gozd,dvzd,depz,&
       nzid = 0
       do ii = 1,nd
       grow = 0
-      gcol = 0
-      gcol(ii) = 1.0 
-      call aprod(2,nd,ndim,grow,gcol,leniw,lenrw,iw,rw)
+      start = sum(nrow(1:ii-1))
+      do ix = 1,nrow(ii)
+      grow(colg(start+ix)) = rw(start+ix)
+      enddo
+      !gcol = 0
+      !gcol(ii) = 1.0 
+      !call aprod(2,nd,ndim,grow,gcol,leniw,lenrw,iw,rw)
       subrow = 0
       call aprod(1,ncells,ndim,grow,subrow,leniw_p,lenrw_p,iw_p,rw_p)
       do ix = 1,ncells
