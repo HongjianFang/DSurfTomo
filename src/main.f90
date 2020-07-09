@@ -100,15 +100,15 @@ program SurfTomo
         integer ifsyn
         real averdws
         real maxnorm
-        real threshold0
+        real threshold0,q25,q75
 
         !For Poisson Voronoi inverison
         integer iproj,vorotomo,ncells,nrealizations,idx
         real hvratio
 
         ! OPEN FILES FIRST TO OUTPUT THE PROCESS
-        nout=36
-        open(nout,file='lsmr.txt')
+        !nout=36
+        !open(nout,file='lsmr.txt')
 
         ! OUTPUT PROGRAM INFOMATION            
         write(*,*)
@@ -366,10 +366,18 @@ program SurfTomo
         cbst(i) = obst(i) - dsyn(i)
         enddo
 
+        call getpercentile(dall,cbst,q25,q75)
+        datweight = 1.0
         do i = 1,dall
-        datweight(i) = 0.01+1.0/(1+0.05*exp(cbst(i)**2*threshold0))
-        cbst(i) = cbst(i)*datweight(i)
+        if (cbst(i)<q25*threshold0 .or. cbst(i)>q75*threshold0) then
+            datweight(i) = 0.0
+            cbst(i) = 0
+        endif
         enddo
+       ! do i = 1,dall
+       ! datweight(i) = 0.01+1.0/(1+0.05*exp(cbst(i)**2*threshold0))
+       ! cbst(i) = cbst(i)*datweight(i)
+       ! enddo
 
         do i = 1,nar
         rw(i) = rw(i)*datweight(iw(1+i))
@@ -531,14 +539,14 @@ program SurfTomo
                 residual after weighting: ',mean*1000,'ms ',1000*std_devs,'ms ',&
                 dnrm2(dall,cbst,1)/sqrt(real(dall))
 
-        do i =1,dall
-        cbst(i)=cbst(i)/datweight(i)
-        enddo
+        !do i =1,dall
+        !cbst(i)=cbst(i)/datweight(i)
+        !enddo
 
-        mean = sum(cbst(1:dall))/dall
-        std_devs = sqrt(sum(cbst(1:dall)**2)/dall - mean**2)
-        write(*,'(a,f8.1,a,f8.2,a,f8.3)')' residual before weighting: ',mean*1000,'ms ',1000*std_devs,'ms ',&
-                dnrm2(dall,cbst,1)/sqrt(real(dall))
+        !mean = sum(cbst(1:dall))/dall
+        !std_devs = sqrt(sum(cbst(1:dall)**2)/dall - mean**2)
+        !write(*,'(a,f8.1,a,f8.2,a,f8.3)')' residual before weighting: ',mean*1000,'ms ',1000*std_devs,'ms ',&
+        !        dnrm2(dall,cbst,1)/sqrt(real(dall))
         write(66,'(i2,a)')iter,'th iteration...'
 !        write(66,'(a,f7.3)')'weight is:',weight
         write(66,'(a,f8.1,a,f8.2,a,f8.3)')'mean,std_devs and rms of &
@@ -639,8 +647,8 @@ program SurfTomo
  
         endif
 
-        close(40)
-        close(nout) !close lsmr.txt
+        !close(40)
+        !close(nout) !close lsmr.txt
         close(66) !close surf_tomo.log
 
         deallocate(obst)

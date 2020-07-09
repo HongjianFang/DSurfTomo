@@ -6,10 +6,10 @@ subroutine voronoiproj(leniw,lenrw,colg,nrow,rw,dres,goxd,dvxd,gozd,dvzd,depz,&
       integer leniw,lenrw
       integer nx,ny,nz
 !      integer iw(leniw)
-      integer colg(leniw),nrow(nd)
+      integer colg(lenrw),nrow(nd)
       real depz(nz)
       real rw(lenrw)
-      integer ncells
+      integer ncells,acells
       real dv(*),dres(*)
       real goxd,gozd,dvxd,dvzd
       real damp
@@ -27,6 +27,7 @@ subroutine voronoiproj(leniw,lenrw,colg,nrow,rw,dres,goxd,dvxd,gozd,dvzd,depz,&
       integer maxnar,nzid
       integer iseed(4)
       real xs,ys,zs
+      real rx
 
       real atol,btol
       real conlim
@@ -58,10 +59,10 @@ subroutine voronoiproj(leniw,lenrw,colg,nrow,rw,dres,goxd,dvxd,gozd,dvzd,depz,&
       !rad(ii) = cmb+depz(ii)*hvratio
       enddo
 
-      allocate(theta(ncells),phi(ncells),rrad(ncells),dws(ncells),norm(ncells))
+      allocate(theta(ncells),phi(ncells),rrad(ncells),norm(ncells))
       allocate(xpts(ncells),ypts(ncells),zpts(ncells),dis(ncells),xunknown(ncells))
       allocate(rw_p(ndim))
-      allocate(iw_p(2*ndim+1),row(ndim),col(ndim))
+      allocate(iw_p(2*ndim+1),row(ndim),col(ndim),dws(ndim))
 
       iseed(1:3) = (/38,62,346/)
       iseed(4) = 2*iproj+1
@@ -71,6 +72,23 @@ subroutine voronoiproj(leniw,lenrw,colg,nrow,rw,dres,goxd,dvxd,gozd,dvzd,depz,&
       phi = pi/2-(goxd-phi*(nx-3)*dvxd)*pi/180
       call slarnv(1,iseed,ncells,rrad)
       rrad = radius-rrad*depz(nz-1)*hvratio
+
+      ! adaptive cells based on dws, assume 1/2 of all ncells are used
+      ! as adaptive cells
+      dws = 0
+      do ii = 1,lenrw
+      dws(colg(ii)) = dws(colg(ii))+abs(rw(ii))
+      enddo
+      acells = int(ncells/2.0)
+      do ii = ncells-acells,ncells
+      call random_index(idx,dws) 
+      ix = mod(idx,nx-2)
+      iy = idx/(nx-2)
+      iz = idx/((nx-2)*(ny-2))
+      theta(ii) = (gozd+(ix+1)*dvzd)*pi/180
+      phi(ii) = pi/2-(goxd-(iy+1)*dvxd)*pi/180
+      rrad(ii) = radius-depz(iz+1)*hvratio
+      enddo
 
       xpts = rrad*sin(phi)*cos(theta)
       ypts = rrad*sin(phi)*sin(theta)
@@ -127,10 +145,6 @@ subroutine voronoiproj(leniw,lenrw,colg,nrow,rw,dres,goxd,dvxd,gozd,dvzd,depz,&
       iwgp(1) = lenrwgp
       iwgp(nzid+2:nzid*2+1) = colgp(1:nzid)
 
-      dws = 0
-      !do ii=1,nzid
-      !dws(iwgp(1+ii+nzid)) = dws(iwgp(1+ii+nzid))+abs(rwgp(ii))
-      !enddo
       norm = 0
       do ii=1,nzid
       norm(iwgp(1+ii+nzid)) = norm(iwgp(1+ii+nzid))+rwgp(ii)**2
@@ -169,6 +183,14 @@ subroutine voronoiproj(leniw,lenrw,colg,nrow,rw,dres,goxd,dvxd,gozd,dvzd,depz,&
       do ii = 1,ncells
         xunknown(ii) = xunknown(ii)/norm(ii)
       enddo
+      norm = (norm**2-0.01)*nd
+      do ii = 1,ncells
+      if (norm(ii)<0.01) then
+          call random_number(rx)
+          xunknown(ii) = xunknown(ii)+rx-0.5
+      endif
+      enddo
+
       dv(1:ndim) = 0
       call aprod(2,ncells,ndim,dv,xunknown,leniw_p,lenrw_p,iw_p,rw_p)
       deallocate(grow,gcol,subrow)
@@ -178,4 +200,23 @@ subroutine voronoiproj(leniw,lenrw,colg,nrow,rw,dres,goxd,dvxd,gozd,dvzd,depz,&
       deallocate(lat,lon,rad)
       deallocate(iwgp,colgp,rwgp)
 
-      end subroutine
+contains
+subroutine random_index( idx, weights )
+    integer :: idx
+    real, intent(in) :: weights(:)
+
+    real x, wsum, prob
+
+    wsum = sum( weights )
+
+    call random_number( x )
+
+    prob = 0
+    do idx = 1, size( weights )
+        prob = prob + weights( idx ) / wsum   !! 0 < prob < 1
+        if ( x <= prob ) exit
+    enddo
+end subroutine random_index
+
+
+end subroutine

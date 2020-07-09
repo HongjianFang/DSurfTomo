@@ -4,7 +4,7 @@ FFLAGS  = -O -ffixed-line-length-none -ffloat-store\
            -fbounds-check -m64 -mcmodel=medium
 F90SRCS = lsmrDataModule.f90 lsmrblasInterface.f90\
           lsmrblas.f90 lsmrModule.f90 delsph.f90\
-	  aprod.f90 gaussian.f90 voronoiproj.f90
+	      aprod.f90 gaussian.f90 voronoiproj.f90 getpercentile.f90
 FSRCS =  surfdisp96.f slarnv.f slaruv.f
 OBJS = $(F90SRCS:%.f90=%.o) $(FSRCS:%.f=%.o) CalSurfG.o main.o
 all:$(CMD)

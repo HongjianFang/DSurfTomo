@@ -18,5 +18,5 @@ surfdataTB.dat                   c: data file
 0                                c: kmaxLg
 0                                c: synthetic flag(0:real data,1:synthetic)
 0.02                             c: noiselevel
-0.05                             c: threshold
-1 100 50                         c: vorotomo,ncells,nrelizations
+1.5                              c: outlier factor (>=1.5)
+1 200 50                         c: vorotomo,ncells,nrelizations

@@ -1,3 +1,7 @@
 *.o
 *.mod
+Applications
+example_*
+.gitignore
+temp
 
