@@ -174,9 +174,9 @@ program SurfTomo
                 if (checkstat > 0) stop 'error allocating RP'
                 read(10,*)(tRc(i),i=1,kmaxRc)
                 write(*,*)'Rayleigh wave phase velocity used,periods:(s)'
-                write(*,'(50f7.1)')(tRc(i),i=1,kmaxRc)
+                write(*,'(50f7.2)')(tRc(i),i=1,kmaxRc)
                 write(66,*)'Rayleigh wave phase velocity used,periods:(s)'
-                write(66,'(50f7.1)')(tRc(i),i=1,kmaxRc)
+                write(66,'(50f7.2)')(tRc(i),i=1,kmaxRc)
         endif
         read(10,*)kmaxRg
         if(kmaxRg.gt.0)then
@@ -184,9 +184,9 @@ program SurfTomo
                 if (checkstat > 0) stop 'error allocating RP'
                 read(10,*)(tRg(i),i=1,kmaxRg)
                 write(*,*)'Rayleigh wave group velocity used,periods:(s)'
-                write(*,'(50f7.1)')(tRg(i),i=1,kmaxRg)
+                write(*,'(50f7.2)')(tRg(i),i=1,kmaxRg)
                 write(66,*)'Rayleigh wave group velocity used,periods:(s)'
-                write(66,'(50f7.1)')(tRg(i),i=1,kmaxRg)
+                write(66,'(50f7.2)')(tRg(i),i=1,kmaxRg)
         endif
         read(10,*)kmaxLc
         if(kmaxLc.gt.0)then
@@ -194,9 +194,9 @@ program SurfTomo
                 if (checkstat > 0) stop 'error allocating RP'
                 read(10,*)(tLc(i),i=1,kmaxLc)
                 write(*,*)'Love wave phase velocity used,periods:(s)'
-                write(*,'(50f7.1)')(tLc(i),i=1,kmaxLc)
+                write(*,'(50f7.2)')(tLc(i),i=1,kmaxLc)
                 write(66,*)'Love wave phase velocity used,periods:(s)'
-                write(66,'(50f7.1)')(tLc(i),i=1,kmaxLc)
+                write(66,'(50f7.2)')(tLc(i),i=1,kmaxLc)
         endif
         read(10,*)kmaxLg
         if(kmaxLg.gt.0)then
@@ -204,9 +204,9 @@ program SurfTomo
                 if (checkstat > 0) stop 'error allocating RP'
                 read(10,*)(tLg(i),i=1,kmaxLg)
                 write(*,*)'Love wave group velocity used,periods:(s)'
-                write(*,'(50f7.1)')(tLg(i),i=1,kmaxLg)
+                write(*,'(50f7.2)')(tLg(i),i=1,kmaxLg)
                 write(66,*)'Love wave group velocity used,periods:(s)'
-                write(66,'(50f7.1)')(tLg(i),i=1,kmaxLg)
+                write(66,'(50f7.2)')(tLg(i),i=1,kmaxLg)
         endif
         read(10,*)ifsyn
         read(10,*)noiselevel

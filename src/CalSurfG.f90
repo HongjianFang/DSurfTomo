@@ -1108,7 +1108,7 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
     igr=0
 !    print*,kmax
     call caldespersion(nx,ny,nz,vels,pvRc, &
-        iwave,igr,kmax,tRg,depz,minthk)
+        iwave,igr,kmaxRg,tRg,depz,minthk)
     igr=1
     print*,'Rayleigh wave group velocity depth kernel'
     call depthkernel(nx,ny,nz,vels,pvRg,sen_vsRg,sen_vpRg, &
@@ -1126,7 +1126,7 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
     iwave=1
     igr=0
     call caldespersion(nx,ny,nz,vels,pvLc, &
-        iwave,igr,kmax,tLg,depz,minthk)
+        iwave,igr,kmaxLg,tLg,depz,minthk)
     igr=1
     call depthkernel(nx,ny,nz,vels,pvLg,sen_vsLg,sen_vpLg, &
       sen_rhoLg,iwave,igr,kmaxLg,tLg,depz,minthk)
