@@ -308,7 +308,7 @@ c -----         print *, itst,iq,t(k),t1a,t1b,cc0,cc1,gvel
         if(iverb(ifunc).eq.0)then
             iverb(ifunc) = 1
           write(LOT,*)'improper initial value in disper - no zero found'
-          write(*,*)'WARNING:improper initial value in disper - no zero found'
+          !write(*,*)'WARNING:improper initial value in disper - no zero found'
         write(LOT,*)'in fundamental mode '
         write(LOT,*)'This may be due to low velocity zone '
         write(LOT,*)'causing reverse phase velocity dispersion, '
