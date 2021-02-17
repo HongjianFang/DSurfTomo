@@ -150,9 +150,9 @@ program SurfTomo
         read(10,*) spfra
         read(10,*) kmaxRc
         write(*,*)  'model origin:latitude,longitue'
-        write(*,'(2f10.4)') goxd,gozd
+        write(*,'(2f10.5)') goxd,gozd
         write(*,*) 'grid spacing:latitude,longitue'
-        write(*,'(2f10.4)') dvxd,dvzd
+        write(*,'(2f10.5)') dvxd,dvzd
         write(*,*) 'model dimension:nx,ny,nz'
         write(*,'(3i5)') nx,ny,nz
         write(logfile,'(a,a)')trim(inputfile),'.log' 
@@ -163,9 +163,9 @@ program SurfTomo
                 (fanghj@mail.ustc.edu.cn) if you find any bug'
         write(66,*)
         write(66,*) 'model origin:latitude,longitue'
-        write(66,'(2f10.4)') goxd,gozd
+        write(66,'(2f10.5)') goxd,gozd
         write(66,*) 'grid spacing:latitude,longitue'
-        write(66,'(2f10.4)') dvxd,dvzd
+        write(66,'(2f10.5)') dvxd,dvzd
         write(66,*) 'model dimension:nx,ny,nz'
         write(66,'(3i5)') nx,ny,nz
         if(kmaxRc.gt.0)then
@@ -324,7 +324,7 @@ program SurfTomo
         enddo
         close(10)
         write(*,*) 'grid points in depth direction:(km)'
-        write(*,'(50f7.1)') depz
+        write(*,'(50f7.2)') depz
 
         ! CHECKERBOARD TEST
         if (ifsyn == 1) then
@@ -579,7 +579,7 @@ program SurfTomo
         do k=1,nz-1
         do j=1,ny-2
         do i=1,nx-2
-        write(64,'(5f9.3)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsf(i+1,j+1,k)
+        write(64,'(5f10.5)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsf(i+1,j+1,k)
         enddo
         enddo
         enddo
@@ -600,8 +600,8 @@ program SurfTomo
                 do k=1,nz-1
                 do j=1,ny-2
                 do i=1,nx-2
-                write(65,'(5f9.3)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsftrue(i+1,j+1,k)
-                write(63,'(5f9.3)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsf(i+1,j+1,k)
+                write(65,'(5f10.5)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsftrue(i+1,j+1,k)
+                write(63,'(5f10.5)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsf(i+1,j+1,k)
                 enddo
                 enddo
                 enddo
@@ -621,7 +621,7 @@ program SurfTomo
                 do k=1,nz-1
                 do j=1,ny-2
                 do i=1,nx-2
-                write(64,'(5f9.3)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsf(i+1,j+1,k)
+                write(64,'(5f10.5)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),vsf(i+1,j+1,k)
                 enddo
                 enddo
                 enddo
@@ -638,7 +638,7 @@ program SurfTomo
                 do j=1,ny-2
                 do i=1,nx-2
                 idx = (k-1)*(nx-2)*(ny-2)+(j-1)*(nx-2)+i
-                write(64,'(5f9.3)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),dvstd(idx)
+                write(64,'(5f10.5)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),dvstd(idx)
                 enddo
                 enddo
                 enddo
