@@ -212,7 +212,8 @@ program SurfTomo
         read(10,*)noiselevel
         read(10,*) threshold0
 
-        read(10,*) vorotomo,ncells,nrealizations!,hvratio
+        !read(10,*) vorotomo,ncells,nrealizations!,hvratio
+        vorotomo = 0
         close(10)
         nrc=nsrc
         kmax=kmaxRc+kmaxRg+kmaxLc+kmaxLg
@@ -512,10 +513,10 @@ program SurfTomo
         leniw = 2*nar+1
         lenrw = nar
         dv = 0
-        !atol = 1e-4
-        !btol = 1e-4
-        atol = 1e-3/((dvxd+dvzd)*111.19/2.0*0.1) !1e-2
-        btol = 1e-3/(dvxd*nx*111.19/3.0)!1e-3
+        atol = 1e-6
+        btol = 1e-6
+        !atol = 1e-3/((dvxd+dvzd)*111.19/2.0*0.1) !1e-2
+        !btol = 1e-3/(dvxd*nx*111.19/3.0)!1e-3
         conlim = 100
         itnlim = 400
         istop = 0
