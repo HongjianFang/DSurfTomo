@@ -102,9 +102,6 @@ program SurfTomo
         real maxnorm
         real threshold0,q25,q75
 
-        !For Poisson Voronoi inverison
-        integer iproj,vorotomo,ncells,nrealizations,idx
-        real hvratio
 
         ! OPEN FILES FIRST TO OUTPUT THE PROCESS
         !nout=36
@@ -112,7 +109,7 @@ program SurfTomo
 
         ! OUTPUT PROGRAM INFOMATION            
         write(*,*)
-        write(*,*) '                             DSurfTomo (v2.0)'
+        write(*,*) '                             DSurfTomo (v1.3)'
         !write(*,*) 'PLEASE contact Hongjain Fang &
         !        (fanghj@mail.ustc.edu.cn) if you find any bug'
         write(*,*) 'For bug report, PLEASE contact Hongjain Fang &
@@ -212,8 +209,6 @@ program SurfTomo
         read(10,*)noiselevel
         read(10,*) threshold0
 
-        !read(10,*) vorotomo,ncells,nrealizations!,hvratio
-        vorotomo = 0
         close(10)
         nrc=nsrc
         kmax=kmaxRc+kmaxRg+kmaxLc+kmaxLg
@@ -292,7 +287,7 @@ program SurfTomo
         maxnar = spfra*dall*nx*ny*nz!sparsity fraction
         if (maxnar<0) print*, 'number overflow, decrease your sparsefrac'
         maxvp = (nx-2)*(ny-2)*(nz-1)
-        allocate(dv(maxvp),dvsub(maxvp),dvstd(maxvp),dvall(maxvp*nrealizations), stat=checkstat)
+        allocate(dv(maxvp),dvsub(maxvp),dvstd(maxvp),dvall(maxvp), stat=checkstat)
 !        allocate(dvall(maxvp*nrealizations),stats=checkstat)
         allocate(norm(maxvp), stat=checkstat)
         allocate(vsf(nx,ny,nz), stat=checkstat)
@@ -416,43 +411,6 @@ program SurfTomo
         endif
 
 
-        ! ADDING REGULARIZATION TERM
-        if (vorotomo /= 0) then
-
-            nrow = 0
-            hvratio = dvxd*(nx-3)*111.19/depz(nz-1)
-            dv = 0
-            dvstd = 0
-            leniw = 2*nar+1
-            lenrw = nar
-            iw(1)=nar
-            iw(nar+2:2*nar+1) = col(1:nar)
-            do i = 1,nar
-            nrow(iw(1+i)) = nrow(iw(1+i))+1
-            enddo
-!            print*,sum(nrow(1:dall)),nar
-!            print*,'no. of nonzero:',nar!,minval(cbst),maxval(cbst)
-            !$omp parallel &
-            !$omp default(private) &
-            !$omp shared(leniw,lenrw,col,nrow,rw,cbst,goxd,gozd,dvxd,dvzd,depz,maxvp) &
-            !$omp shared(nx,ny,nz,dall,ncells,hvratio,damp,nrealizations,dvall)
-            !$omp do
-            do iproj = 1,nrealizations
-            call voronoiproj(leniw,lenrw,col,nrow,rw,cbst,goxd,dvxd,gozd,dvzd,depz,&
-                       nx,ny,nz,dall,ncells,hvratio,damp,iproj,dvsub)
-            dvall((iproj-1)*maxvp+1:iproj*maxvp) = dvsub(1:maxvp)
-            enddo
-            !$omp end do
-            !$omp end parallel
-            do iproj = 1,nrealizations
-            dvsub = dvall((iproj-1)*maxvp+1:iproj*maxvp)!:,iproj)
-            dv = dv+dvsub
-            dvstd = dvstd+dvsub**2
-            enddo
-            dv = dv/nrealizations
-            dvstd = sqrt(dvstd/nrealizations-dv**2)
-        else
-
         weight=weight0
         nar_tmp=nar
         nars=0
@@ -529,8 +487,6 @@ program SurfTomo
         call LSMR(m, n, leniw, lenrw,iw,rw,cbst, damp,&
                 atol, btol, conlim, itnlim, localSize, nout,&
                 dv, istop, itn, anorm, acond, rnorm, arnorm, xnorm)
-
-        endif  ! end vorotomo
         
         mean = sum(cbst(1:dall))/dall
         std_devs = sqrt(sum(cbst(1:dall)**2)/dall - mean**2)
@@ -632,22 +588,8 @@ program SurfTomo
                 write(66,*)'Output inverted shear velocity model &
                         to ',outmodel
 
-                if (vorotomo /= 0) then
-                write(outmodel,'(a,a)') trim(inputfile),'Measure_std.dat'
-                open(64,file=outmodel)
-                do k=1,nz-1
-                do j=1,ny-2
-                do i=1,nx-2
-                idx = (k-1)*(nx-2)*(ny-2)+(j-1)*(nx-2)+i
-                write(64,'(5f10.5)') gozd+(j-1)*dvzd,goxd-(i-1)*dvxd,depz(k),dvstd(idx)
-                enddo
-                enddo
-                enddo
-                close(64)
-                endif
- 
+             
         endif
-
         !close(40)
         !close(nout) !close lsmr.txt
         close(66) !close surf_tomo.log
