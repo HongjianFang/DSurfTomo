@@ -109,7 +109,7 @@ program SurfTomo
 
         ! OUTPUT PROGRAM INFOMATION            
         write(*,*)
-        write(*,*) '                             DSurfTomo (v1.3)'
+        write(*,*) '                             DSurfTomo (v1.4)'
         !write(*,*) 'PLEASE contact Hongjain Fang &
         !        (fanghj@mail.ustc.edu.cn) if you find any bug'
         write(*,*) 'For bug report, PLEASE contact Hongjain Fang &
