@@ -1378,13 +1378,11 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
         !  if required.
         !
         if (igrt(srcnum,knumi) == 0 .or. (ig == 2 .and. igrt(srcnum,knumi) == 1)) then
-        ! a little stupid, remember to change latter
-        !if (igrt(srcnum,knumi) == 1) then
-        !call gridder(velf0)
-        !endif
         count11=count11+1
         CALL rpaths(x,z,fdm,rcxf(istep,srcnum,knumi),rczf(istep,srcnum,knumi))
         row(1:nparpi)=0.0
+        ! change the Brocher relationship if depth is larger than 35 km         
+        if (depz(nz-1)<35.0) then
         do jj=1,nvz
           do kk=1,nvx
             if(abs(fdm(jj,kk)).ge.ftol) then
@@ -1402,6 +1400,28 @@ subroutine CalSurfG(nx,ny,nz,nparpi,vels,iw,rw,col,dsurf, &
             endif
           enddo
         enddo
+      ! use a different formulation between Vp, Vs, and Rho, according to Luosong's
+      else
+        do jj=1,nvz
+          do kk=1,nvx
+            if(abs(fdm(jj,kk)).ge.ftol) then
+              coe_a=(2.2110-0.8984*2*vels(kk+1,jj+1,1:nz-1)+&
+              0.2786*3*vels(kk+1,jj+1,1:nz-1)**2-0.02412*4*vels(kk+1,jj+1,1:nz-1)**3)
+              vpft=0.9098 + 2.2110*vels(kk+1,jj+1,1:nz-1) - 0.8984*vels(kk+1,jj+1,1:nz-1)**2+ &
+              0.2786*vels(kk+1,jj+1,1:nz-1)**3 - 0.02412*vels(kk+1,jj+1,1:nz-1)**4
+              coe_rho=coe_a*(1.6612-0.4721*2*vpft+&
+              0.0671*3*vpft**2-0.0043*4*vpft**3+&
+              0.000106*5*vpft**4)
+
+              row((jj-1)*nvx+kk:(nz-2)*nvz*nvx+(jj-1)*nvx+kk:nvx*nvz)=&
+                (sen_vp(jj*(nvx+2)+kk+1,knumi,1:nz-1)*coe_a+&
+                sen_rho(jj*(nvx+2)+kk+1,knumi,1:nz-1)*coe_rho+&
+                sen_vs(jj*(nvx+2)+kk+1,knumi,1:nz-1))*fdm(jj,kk)
+            endif
+          enddo
+        enddo
+      endif
+
         do nn=1,nparpi
           if(abs(row(nn)).gt.ftol) then
             nar=nar+1
